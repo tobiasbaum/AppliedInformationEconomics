@@ -1,0 +1,32 @@
+apply plugin:'java-library'
+apply plugin:'eclipse'
+
+sourceCompatibility = 1.8
+version = '1.0'
+
+tasks.compileJava.options.encoding = 'UTF-8'
+
+sourceSets {
+   main {
+      java {
+         srcDir 'src'
+      }
+      resources {
+         srcDir 'resources'
+      }
+   }
+   test {
+      java {
+         srcDir 'test'
+      }
+   }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation 'junit:junit:4.+',
+        'org.hamcrest:hamcrest-all:1.3'
+}
