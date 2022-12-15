@@ -27,14 +27,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
-import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.function.Function;
-
-import de.set.aie.base.Distributions.StdDist;
 
 public class Model {
 
@@ -103,7 +100,7 @@ public class Model {
         System.out.println("Choice with best expected value: " + bestChoice);
         System.out.println();
 
-        final Random sampleRandom = new Random(seed);
+        final RandomSource sampleRandom = RandomSource.wrap(new Random(seed));
         final Map<String, Mean> meanLosses = new LinkedHashMap<>();
         for (final String name : this.map.keySet()) {
             meanLosses.put(name, Mean.undefined());
@@ -198,7 +195,7 @@ public class Model {
 
     private Quantity reduceAndDetermineMeanVOI(final String toReduce, final long seed, final String valueVariable) {
         double sum = 0.0;
-        final Random sampleRandom = new Random(seed);
+        final RandomSource sampleRandom = RandomSource.wrap(new Random(seed));
         for (int i = 0; i < VOI_SAMPLE_COUNT; i++) {
             final Instance reducedInstance = this.createReducedInstance(toReduce, sampleRandom);
             final Quantity voi = this.determineValueOfPerfectInformation(seed + i, reducedInstance.get(valueVariable));
@@ -207,19 +204,19 @@ public class Model {
         return Quantity.of(sum / VOI_SAMPLE_COUNT, this.instantiate().get(valueVariable).getUnit());
     }
 
-    private Instance createReducedInstance(final String toReduce, final Random sampleRandom) {
+    private Instance createReducedInstance(final String toReduce, final RandomSource sampleRandom) {
         final Quantity sample = this.sampleValue(toReduce, sampleRandom);
         final Instance reducedInstance = this.instantiate();
         reducedInstance.vars.put(toReduce, Distributions.fixed(sample));
         return reducedInstance;
     }
 
-    private Quantity sampleValue(final String toReduce, final Random sampleRandom) {
+    private Quantity sampleValue(final String toReduce, final RandomSource sampleRandom) {
         return this.instantiate().get(toReduce).observe(sampleRandom, 0);
     }
 
     private Quantity determineValueOfPerfectInformation(final long seed, final RandomVariable randomVariable) {
-        final Random r = new Random(seed);
+        final RandomSource r = RandomSource.wrap(new Random(seed));
         double costOfWrongDecision1 = 0.0;
         int count1 = 0;
         double costOfWrongDecision2 = 0.0;
@@ -251,7 +248,7 @@ public class Model {
     }
 
     public void printDistributions(final File file, final long seed, final String... columns) throws IOException {
-        final Random r = new Random(seed);
+        final RandomSource r = RandomSource.wrap(new Random(seed));
         try (FileOutputStream out = new FileOutputStream(file);
                 BufferedWriter w = new BufferedWriter(new OutputStreamWriter(out, "UTF-8"))) {
             final Instance inst = this.instantiate();

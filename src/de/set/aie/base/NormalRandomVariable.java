@@ -15,8 +15,6 @@
  */
 package de.set.aie.base;
 
-import java.util.Random;
-
 public class NormalRandomVariable extends RandomVariable {
 
     private final double mean;
@@ -30,7 +28,7 @@ public class NormalRandomVariable extends RandomVariable {
     }
 
     @Override
-    public Quantity observe(final Random r, final int run) {
+    public Quantity observe(final RandomSource r, final int run) {
         return Quantity.of(r.nextGaussian() * this.sd + this.mean, this.unit);
     }
 

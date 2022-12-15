@@ -15,8 +15,6 @@
  */
 package de.set.aie.base;
 
-import java.util.Random;
-
 public class BlockDistributedRandomVariable extends RandomVariable {
 
     private final double lower;
@@ -30,7 +28,7 @@ public class BlockDistributedRandomVariable extends RandomVariable {
     }
 
     @Override
-    public Quantity observe(final Random r, final int run) {
+    public Quantity observe(final RandomSource r, final int run) {
         final double type = r.nextDouble();
         final double diff = this.upper - this.lower;
         if (type < 0.05) {

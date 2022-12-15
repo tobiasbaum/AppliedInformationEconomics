@@ -15,8 +15,6 @@
  */
 package de.set.aie.base;
 
-import java.util.Random;
-
 public class RangeBoundRandomVariable extends RandomVariable {
 
     private final RandomVariable base;
@@ -30,7 +28,7 @@ public class RangeBoundRandomVariable extends RandomVariable {
     }
 
     @Override
-    public Quantity observe(final Random r, final int run) {
+    public Quantity observe(final RandomSource r, final int run) {
         final Quantity q = this.base.observe(r, run);
         if (q.getNumber() < this.lower) {
             return Quantity.of(this.lower, q.getUnit());

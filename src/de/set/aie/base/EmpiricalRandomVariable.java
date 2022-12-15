@@ -15,8 +15,6 @@
  */
 package de.set.aie.base;
 
-import java.util.Random;
-
 public class EmpiricalRandomVariable extends RandomVariable {
 
     private final double[] values;
@@ -29,7 +27,7 @@ public class EmpiricalRandomVariable extends RandomVariable {
     }
 
     @Override
-    public Quantity observe(final Random r, final int run) {
+    public Quantity observe(final RandomSource r, final int run) {
         final int index = r.nextInt(this.values.length);
         return Quantity.of(this.values[index], this.getUnit());
     }

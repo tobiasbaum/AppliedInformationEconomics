@@ -14,7 +14,6 @@
  * GNU General Public License for more details.
  */
 package de.set.aie.base;
-import java.util.Random;
 
 public class RandomVariableQuotient extends RandomVariable {
 
@@ -27,7 +26,7 @@ public class RandomVariableQuotient extends RandomVariable {
     }
 
     @Override
-    public Quantity observe(final Random r, final int run) {
+    public Quantity observe(final RandomSource r, final int run) {
         return this.r1.observe(r, run).div(this.r2.observe(r, run));
     }
 

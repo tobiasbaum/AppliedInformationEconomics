@@ -15,8 +15,6 @@
  */
 package de.set.aie.base;
 
-import java.util.Random;
-
 public class BinomRandomVariable extends RandomVariable {
 
     private final RandomVariable count;
@@ -29,7 +27,7 @@ public class BinomRandomVariable extends RandomVariable {
     }
 
     @Override
-    public Quantity observe(final Random r, final int run) {
+    public Quantity observe(final RandomSource r, final int run) {
         final long cnt = Math.round(this.count.observe(r, run).getNumber());
         final double p = this.propability.observe(r, run).getNumber();
         long sum = 0;

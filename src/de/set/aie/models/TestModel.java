@@ -15,13 +15,13 @@
  */
 package de.set.aie.models;
 
-import java.util.Random;
 import java.util.concurrent.ExecutionException;
 
 import de.set.aie.base.Distributions;
 import de.set.aie.base.Model;
 import de.set.aie.base.Model.Instance;
 import de.set.aie.base.Quantity;
+import de.set.aie.base.RandomSource;
 import de.set.aie.base.RandomVariable;
 import de.set.aie.base.Unit;
 
@@ -29,7 +29,7 @@ public class TestModel {
 
     private static class EqRv extends RandomVariable {
         @Override
-        public Quantity observe(final Random r, final int run) {
+        public Quantity observe(final RandomSource r, final int run) {
             return Quantity.of(r.nextDouble(), Unit.scalar());
         }
 

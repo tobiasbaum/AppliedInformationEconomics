@@ -51,7 +51,7 @@ public class BlockDistributedRandomVariableTest {
     static double[] sample(final RandomVariable v, final Unit expectedUnit) {
         assertEquals(expectedUnit, v.getUnit());
         final double[] ret = new double[100_000];
-        final Random r = new Random(1234);
+        final RandomSource r = RandomSource.wrap(new Random(1234));
         for (int i = 0; i < ret.length; i++) {
             final Quantity q = v.observe(r, 0);
             assertEquals(expectedUnit, q.getUnit());

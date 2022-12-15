@@ -15,8 +15,6 @@
  */
 package de.set.aie.base;
 
-import java.util.Random;
-
 public class RandomVariableSum extends RandomVariable {
 
     private final RandomVariable r1;
@@ -28,7 +26,7 @@ public class RandomVariableSum extends RandomVariable {
     }
 
     @Override
-    public Quantity observe(final Random r, final int run) {
+    public Quantity observe(final RandomSource r, final int run) {
         return this.r1.observe(r, run).plus(this.r2.observe(r, run));
     }
 

@@ -15,8 +15,6 @@
  */
 package de.set.aie.base;
 
-import java.util.Random;
-
 public class UncertainDistributionVariable extends RandomVariable {
 
     private final RandomVariable index;
@@ -28,7 +26,7 @@ public class UncertainDistributionVariable extends RandomVariable {
     }
 
     @Override
-    public Quantity observe(final Random r, final int run) {
+    public Quantity observe(final RandomSource r, final int run) {
         final int i = (int) Math.round(this.index.observe(r, run).getNumber());
         return this.dists[i].observe(r, run);
     }

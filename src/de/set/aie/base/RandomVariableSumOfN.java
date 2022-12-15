@@ -15,8 +15,6 @@
  */
 package de.set.aie.base;
 
-import java.util.Random;
-
 public class RandomVariableSumOfN extends RandomVariable {
 
     private final RandomVariable toSum;
@@ -28,7 +26,7 @@ public class RandomVariableSumOfN extends RandomVariable {
     }
 
     @Override
-    public Quantity observe(final Random r, final int run) {
+    public Quantity observe(final RandomSource r, final int run) {
         final Quantity count = this.count.observe(r, run);
         final long max = Math.round(count.getNumber());
         double sum = 0.0;

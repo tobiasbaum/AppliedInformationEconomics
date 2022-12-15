@@ -15,8 +15,6 @@
  */
 package de.set.aie.base;
 
-import java.util.Random;
-
 public class PersistentRandomVariable extends RandomVariable {
 
     private final RandomVariable base;
@@ -28,7 +26,7 @@ public class PersistentRandomVariable extends RandomVariable {
     }
 
     @Override
-    public Quantity observe(final Random r, final int run) {
+    public Quantity observe(final RandomSource r, final int run) {
         if (this.savedValue == null || this.savedRun != run) {
             this.savedValue = this.base.observe(r, run);
             this.savedRun = run;

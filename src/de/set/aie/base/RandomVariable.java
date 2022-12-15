@@ -22,10 +22,10 @@ import java.util.Random;
 
 public abstract class RandomVariable {
 
-    public abstract Quantity observe(Random r, final int run);
+    public abstract Quantity observe(RandomSource r, final int run);
 
     public void simulateTo(final File file, final long seed) throws IOException {
-        final Random r = new Random(seed);
+        final RandomSource r = RandomSource.wrap(new Random(seed));
         try (FileOutputStream out = new FileOutputStream(file)) {
             for (int i = 0; i < 10_000; i++) {
                 final Quantity q = this.observe(r, i);
@@ -85,7 +85,7 @@ public abstract class RandomVariable {
 
     public Sample sample(final long seed, final int sampleCount) {
         final double[] numbers = new double[sampleCount];
-        final Random r = new Random(seed);
+        final RandomSource r = RandomSource.wrap(new Random(seed));
         for (int i = 0; i < sampleCount; i++) {
             numbers[i] = this.observe(r, i).getNumber();
         }
@@ -98,7 +98,7 @@ public abstract class RandomVariable {
 
     public Mean mean(final long seed, final int sampleCount) {
         double sum = 0.0;
-        final Random r = new Random(seed);
+        final RandomSource r = RandomSource.wrap(new Random(seed));
         for (int i = 0; i < sampleCount; i++) {
             sum += this.observe(r, i).getNumber();
         }

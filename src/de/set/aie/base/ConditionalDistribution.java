@@ -15,8 +15,6 @@
  */
 package de.set.aie.base;
 
-import java.util.Random;
-
 public class ConditionalDistribution extends RandomVariable {
 
     private final RandomVariable v1;
@@ -36,7 +34,7 @@ public class ConditionalDistribution extends RandomVariable {
     }
 
     @Override
-    public Quantity observe(final Random r, final int run) {
+    public Quantity observe(final RandomSource r, final int run) {
         if (r.nextDouble() < this.v1Prop.observe(r, run).getNumber()) {
             return this.v1.observe(r, run);
         } else {

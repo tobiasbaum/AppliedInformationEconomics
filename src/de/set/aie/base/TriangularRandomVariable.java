@@ -15,8 +15,6 @@
  */
 package de.set.aie.base;
 
-import java.util.Random;
-
 public class TriangularRandomVariable extends RandomVariable {
 
     private final Quantity lower;
@@ -45,7 +43,7 @@ public class TriangularRandomVariable extends RandomVariable {
     }
 
     @Override
-    public Quantity observe(final Random r, final int run) {
+    public Quantity observe(final RandomSource r, final int run) {
         final double a = this.lower.getNumber();
         final double b = this.upper.getNumber();
         final double c = this.mode.getNumber();

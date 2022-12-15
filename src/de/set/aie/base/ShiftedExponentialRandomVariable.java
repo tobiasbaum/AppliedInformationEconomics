@@ -15,8 +15,6 @@
  */
 package de.set.aie.base;
 
-import java.util.Random;
-
 public class ShiftedExponentialRandomVariable extends RandomVariable {
 
     private final double lambda;
@@ -34,7 +32,7 @@ public class ShiftedExponentialRandomVariable extends RandomVariable {
     }
 
     @Override
-    public Quantity observe(final Random r, final int run) {
+    public Quantity observe(final RandomSource r, final int run) {
         final double sampled = Math.log(1.0 - r.nextDouble()) / -this.lambda;
         final double shifted = this.directionInverse ? this.shift - sampled : this.shift + sampled;
         return Quantity.of(shifted, this.getUnit());
