@@ -21,6 +21,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -284,6 +285,21 @@ public class Model {
         }
     }
 
+    public List<String> getAllPersistentVariables() throws AssertionError {
+        final List<String> allPersistentVariables = new ArrayList<>();
+        final Instance i = this.instantiate();
+        for (final String name : this.map.keySet()) {
+            if (i.get(name) instanceof PersistentRandomVariable) {
+                allPersistentVariables.add(name);
+            }
+        }
+        return allPersistentVariables;
+    }
+
+    public void printDistributions(final File file, final long seed, final Collection<String> columns) throws IOException {
+        this.printDistributions(file, seed, columns.toArray(new String[columns.size()]));
+    }
+
     public void printDistributions(final File file, final long seed, final String... columns) throws IOException {
         final RandomSource r = RandomSource.wrap(new Random(seed));
         try (FileOutputStream out = new FileOutputStream(file);
@@ -292,16 +308,23 @@ public class Model {
             final List<RandomVariable> v = new ArrayList<>();
             w.write("i");
             for (final String colName : columns) {
-                final RandomVariable var = inst.get(colName);
-                v.add(var);
-                w.write(";" + colName + " (" + var.getUnit() + ")");
+                if (this.map.containsKey(colName)) {
+                    final RandomVariable var = inst.get(colName);
+                    v.add(var);
+                    w.write(";" + colName + " (" + var.getUnit() + ")");
+                } else {
+                    w.write(";" + colName);
+                }
             }
             w.write('\n');
             for (int i = 0; i < 10_000; i++) {
                 w.write(Integer.toString(i));
                 final SimulationRun run = new SimulationRun();
                 for (final RandomVariable var : v) {
-                    final Quantity q = var.observe(r, run);
+                    var.observe(r, run);
+                }
+                for (final String colName : columns) {
+                    final Quantity q = run.getPersistentValue(colName);
                     w.write(';');
                     w.write(Double.toString(q.getNumber()).replace('.', ','));
                 }
