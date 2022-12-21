@@ -27,4 +27,8 @@ public interface RandomSource {
 
     public abstract double nextGaussian();
 
+    public default<T> T pickAtRandom(T[] array) {
+        return array[this.nextInt(array.length)];
+    }
+
 }

@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,6 +41,7 @@ public class Model {
 
     public class Instance {
         private final Map<String, RandomVariable> vars = new LinkedHashMap<>();
+        private final Map<String, Object> objects = new HashMap();
 
         public RandomVariable get(final String name) {
             if (this.vars.containsKey(name)) {
@@ -54,6 +56,19 @@ public class Model {
             return v;
         }
 
+        public<T> T getObject(String name) {
+            if (this.objects.containsKey(name)) {
+                return (T) this.objects.get(name);
+            }
+            final Function<Instance, Object> f = Model.this.objectMap.get(name);
+            if (f == null) {
+                throw new IllegalStateException("no definition for object " + name);
+            }
+            final T v = (T) f.apply(this);
+            this.objects.put(name, v);
+            return v;
+        }
+
         public Map<String, Sample> createSamples(final long seed, final int sampleCount, final String[] valueVariables) {
             final Map<String, Sample> samples = new LinkedHashMap<>();
             for (final String v : valueVariables) {
@@ -65,6 +80,7 @@ public class Model {
     }
 
     private final Map<String, Function<Instance, RandomVariable>> map = new LinkedHashMap<>();
+    private final Map<String, Function<Instance, Object>> objectMap = new LinkedHashMap<>();
 
     public void add(final String name, final RandomVariable var) {
         this.add(name, (final Instance i) -> var);
@@ -81,6 +97,13 @@ public class Model {
         for (final Entry<String, Function<Instance, RandomVariable>> f : factoryFunction.create(name).entrySet()) {
             this.add(f.getKey(), f.getValue());
         }
+    }
+
+    public void addObject(final String name, final Function<Instance, Object> producer) {
+        if (this.objectMap.containsKey(name)) {
+            throw new IllegalStateException(name + " already contained");
+        }
+        this.objectMap.put(name, producer);
     }
 
     public Instance instantiate() {
