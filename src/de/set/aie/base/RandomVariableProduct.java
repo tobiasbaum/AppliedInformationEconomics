@@ -26,7 +26,7 @@ public class RandomVariableProduct extends RandomVariable {
     }
 
     @Override
-    public Quantity observe(final RandomSource r, final int run) {
+    public Quantity observe(final RandomSource r, final SimulationRun run) {
         return this.r1.observe(r, run).times(this.r2.observe(r, run));
     }
 

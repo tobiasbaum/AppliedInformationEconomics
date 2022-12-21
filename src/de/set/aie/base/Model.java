@@ -82,15 +82,29 @@ public class Model {
     private final Map<String, Function<Instance, RandomVariable>> map = new LinkedHashMap<>();
     private final Map<String, Function<Instance, Object>> objectMap = new LinkedHashMap<>();
 
+    public void addRaw(final String name, final RandomVariable var) {
+        this.addRaw(name, (final Instance i) -> var);
+    }
+
     public void add(final String name, final RandomVariable var) {
         this.add(name, (final Instance i) -> var);
     }
 
-    public void add(final String name, final Function<Instance, RandomVariable> producer) {
+    public void addRaw(final String name, final Function<Instance, RandomVariable> producer) {
         if (this.map.containsKey(name)) {
             throw new IllegalStateException(name + " already contained");
         }
         this.map.put(name, producer);
+    }
+
+    public void add(final String name, final Function<Instance, RandomVariable> producer) {
+        this.addRaw(name, producer.andThen((RandomVariable v) -> PersistentRandomVariable.ensurePersistent(name, v)));
+    }
+
+    public void addRaw(final String name, final MultiVariableFactory factoryFunction) {
+        for (final Entry<String, Function<Instance, RandomVariable>> f : factoryFunction.create(name).entrySet()) {
+            this.addRaw(f.getKey(), f.getValue());
+        }
     }
 
     public void add(final String name, final MultiVariableFactory factoryFunction) {
@@ -235,7 +249,7 @@ public class Model {
     }
 
     private Quantity sampleValue(final String toReduce, final RandomSource sampleRandom) {
-        return this.instantiate().get(toReduce).observe(sampleRandom, 0);
+        return this.instantiate().get(toReduce).observe(sampleRandom, new SimulationRun());
     }
 
     private Quantity determineValueOfPerfectInformation(final long seed, final RandomVariable randomVariable) {
@@ -246,7 +260,7 @@ public class Model {
         int count2 = 0;
 
         for (int i = 0; i < VOPI_SAMPLE_COUNT; i++) {
-            final double result = randomVariable.observe(r, i).getNumber();
+            final double result = randomVariable.observe(r, new SimulationRun()).getNumber();
             if (result < 0) {
                 costOfWrongDecision1 += -result;
                 count1++;
@@ -285,8 +299,9 @@ public class Model {
             w.write('\n');
             for (int i = 0; i < 10_000; i++) {
                 w.write(Integer.toString(i));
+                final SimulationRun run = new SimulationRun();
                 for (final RandomVariable var : v) {
-                    final Quantity q = var.observe(r, i);
+                    final Quantity q = var.observe(r, run);
                     w.write(';');
                     w.write(Double.toString(q.getNumber()).replace('.', ','));
                 }

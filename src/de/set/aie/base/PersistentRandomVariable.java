@@ -18,20 +18,22 @@ package de.set.aie.base;
 public class PersistentRandomVariable extends RandomVariable {
 
     private final RandomVariable base;
-    private int savedRun;
-    private Quantity savedValue;
+    private final String name;
 
-    public PersistentRandomVariable(final RandomVariable randomVariable) {
+    PersistentRandomVariable(String name, final RandomVariable randomVariable) {
+        this.name = name;
         this.base = randomVariable;
     }
 
     @Override
-    public Quantity observe(final RandomSource r, final int run) {
-        if (this.savedValue == null || this.savedRun != run) {
-            this.savedValue = this.base.observe(r, run);
-            this.savedRun = run;
+    public Quantity observe(final RandomSource r, final SimulationRun run) {
+        if (!run.hasPersistentValue(this.name)) {
+            final Quantity v = this.base.observe(r, run);
+            run.persist(this.name, v);
+            return v;
+        } else {
+            return run.getPersistentValue(this.name);
         }
-        return this.savedValue;
     }
 
     @Override
@@ -42,6 +44,15 @@ public class PersistentRandomVariable extends RandomVariable {
     @Override
     public String getType() {
         return this.base.getType();
+    }
+
+    public static PersistentRandomVariable ensurePersistent(String name2, RandomVariable toPersist) {
+        if (toPersist instanceof PersistentRandomVariable) {
+            assert name2.equals(((PersistentRandomVariable) toPersist).name);
+            return (PersistentRandomVariable) toPersist;
+        } else {
+            return new PersistentRandomVariable(name2, toPersist);
+        }
     }
 
 }

@@ -43,7 +43,7 @@ public class TriangularRandomVariable extends RandomVariable {
     }
 
     @Override
-    public Quantity observe(final RandomSource r, final int run) {
+    public Quantity observe(final RandomSource r, final SimulationRun run) {
         final double a = this.lower.getNumber();
         final double b = this.upper.getNumber();
         final double c = this.mode.getNumber();

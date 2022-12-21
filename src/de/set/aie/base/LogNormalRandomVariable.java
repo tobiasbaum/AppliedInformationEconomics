@@ -28,7 +28,7 @@ public class LogNormalRandomVariable extends RandomVariable {
     }
 
     @Override
-    public Quantity observe(final RandomSource r, final int run) {
+    public Quantity observe(final RandomSource r, final SimulationRun run) {
         return Quantity.of(Math.exp(r.nextGaussian() * this.normalSd + this.normalMean), this.unit);
     }
 

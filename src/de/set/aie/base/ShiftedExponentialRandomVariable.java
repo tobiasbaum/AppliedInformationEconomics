@@ -32,7 +32,7 @@ public class ShiftedExponentialRandomVariable extends RandomVariable {
     }
 
     @Override
-    public Quantity observe(final RandomSource r, final int run) {
+    public Quantity observe(final RandomSource r, final SimulationRun run) {
         final double sampled = Math.log(1.0 - r.nextDouble()) / -this.lambda;
         final double shifted = this.directionInverse ? this.shift - sampled : this.shift + sampled;
         return Quantity.of(shifted, this.getUnit());

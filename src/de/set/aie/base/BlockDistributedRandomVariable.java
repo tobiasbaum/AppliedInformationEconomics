@@ -28,7 +28,7 @@ public class BlockDistributedRandomVariable extends RandomVariable {
     }
 
     @Override
-    public Quantity observe(final RandomSource r, final int run) {
+    public Quantity observe(final RandomSource r, final SimulationRun run) {
         final double type = r.nextDouble();
         final double diff = this.upper - this.lower;
         if (type < 0.05) {

@@ -28,7 +28,7 @@ public class NormalRandomVariable extends RandomVariable {
     }
 
     @Override
-    public Quantity observe(final RandomSource r, final int run) {
+    public Quantity observe(final RandomSource r, final SimulationRun run) {
         return Quantity.of(r.nextGaussian() * this.sd + this.mean, this.unit);
     }
 

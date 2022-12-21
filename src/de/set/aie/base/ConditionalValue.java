@@ -33,7 +33,7 @@ public class ConditionalValue extends RandomVariable {
     }
 
     @Override
-    public Quantity observe(final RandomSource r, final int run) {
+    public Quantity observe(final RandomSource r, final SimulationRun run) {
         if (r.nextDouble() < this.v1Prop) {
             return this.v1;
         } else {

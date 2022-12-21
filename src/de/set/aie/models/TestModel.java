@@ -23,13 +23,14 @@ import de.set.aie.base.Model.Instance;
 import de.set.aie.base.Quantity;
 import de.set.aie.base.RandomSource;
 import de.set.aie.base.RandomVariable;
+import de.set.aie.base.SimulationRun;
 import de.set.aie.base.Unit;
 
 public class TestModel {
 
     private static class EqRv extends RandomVariable {
         @Override
-        public Quantity observe(final RandomSource r, final int run) {
+        public Quantity observe(final RandomSource r, final SimulationRun run) {
             return Quantity.of(r.nextDouble(), Unit.scalar());
         }
 
@@ -48,14 +49,14 @@ public class TestModel {
     public static void main(final String[] args) throws InterruptedException, ExecutionException {
         final Unit EUR = Unit.of("EUR");
         final Model m = new Model();
-        m.add("p", new EqRv());
-        m.add("play", (final Instance i) -> Distributions.conditional(i.get("p"),
+        m.addRaw("p", new EqRv());
+        m.addRaw("play", (final Instance i) -> Distributions.conditional(i.get("p"),
                 Distributions.fixed(Quantity.of(12, EUR)),
                 Distributions.fixed(Quantity.of(-12, EUR))));
 //        m.add("v1", Distributions.normal(1, 21, Unit.of("EUR")));
 //        m.add("v2", Distributions.normal(2, 22, Unit.of("EUR")));
 //        m.add("v1Excess", (final Instance i) -> i.get("v1").minus(i.get("v2")));
-        m.add("notPlay", Distributions.fixed(Quantity.of(0, "EUR")));
+        m.addRaw("notPlay", Distributions.fixed(Quantity.of(0, "EUR")));
 
         m.analyze(1234, "play", "notPlay");
         System.out.println();

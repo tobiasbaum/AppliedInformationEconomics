@@ -27,7 +27,7 @@ public class BinomRandomVariable extends RandomVariable {
     }
 
     @Override
-    public Quantity observe(final RandomSource r, final int run) {
+    public Quantity observe(final RandomSource r, final SimulationRun run) {
         final long cnt = Math.round(this.count.observe(r, run).getNumber());
         final double p = this.propability.observe(r, run).getNumber();
         long sum = 0;

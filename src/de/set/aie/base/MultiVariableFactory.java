@@ -25,8 +25,4 @@ public interface MultiVariableFactory {
 
     public abstract Map<String, Function<Instance, RandomVariable>> create(String baseName);
 
-    public default MultiVariableFactory makePersistent() {
-        return new MakePersistentVariableFactory(this);
-    }
-
 }

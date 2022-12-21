@@ -21,12 +21,12 @@ public class UncertainDistributionVariable extends RandomVariable {
     private final RandomVariable[] dists;
 
     public UncertainDistributionVariable(final RandomVariable index, final RandomVariable... dists) {
-        this.index = index.makePersistent();
+        this.index = index;
         this.dists = dists;
     }
 
     @Override
-    public Quantity observe(final RandomSource r, final int run) {
+    public Quantity observe(final RandomSource r, final SimulationRun run) {
         final int i = (int) Math.round(this.index.observe(r, run).getNumber());
         return this.dists[i].observe(r, run);
     }

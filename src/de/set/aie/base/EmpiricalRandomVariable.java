@@ -27,7 +27,7 @@ public class EmpiricalRandomVariable extends RandomVariable {
     }
 
     @Override
-    public Quantity observe(final RandomSource r, final int run) {
+    public Quantity observe(final RandomSource r, final SimulationRun run) {
         final int index = r.nextInt(this.values.length);
         return Quantity.of(this.values[index], this.getUnit());
     }

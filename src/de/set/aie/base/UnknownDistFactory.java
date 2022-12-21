@@ -64,8 +64,10 @@ class UnknownDistFactory implements MultiVariableFactory {
             indices[i] = i;
         }
         final Map<String, Function<Instance, RandomVariable>> ret = new LinkedHashMap<>();
-        ret.put(baseName + "_dist", //$NON-NLS-1$
-                (final Instance m) -> Distributions.empirical(Unit.scalar(), indices));
+        final String distName = baseName + "_dist"; //$NON-NLS-1$
+        ret.put(distName,
+                (final Instance m) -> PersistentRandomVariable.ensurePersistent(distName,
+                        Distributions.empirical(Unit.scalar(), indices)));
         ret.put(baseName, (final Instance m) ->
             new UncertainDistributionVariable(
                     m.get(baseName + "_dist"), //$NON-NLS-1$

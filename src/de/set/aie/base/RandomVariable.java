@@ -22,13 +22,13 @@ import java.util.Random;
 
 public abstract class RandomVariable {
 
-    public abstract Quantity observe(RandomSource r, final int run);
+    public abstract Quantity observe(RandomSource r, final SimulationRun run);
 
     public void simulateTo(final File file, final long seed) throws IOException {
         final RandomSource r = RandomSource.wrap(new Random(seed));
         try (FileOutputStream out = new FileOutputStream(file)) {
             for (int i = 0; i < 10_000; i++) {
-                final Quantity q = this.observe(r, i);
+                final Quantity q = this.observe(r, new SimulationRun());
                 final String s = Double.toString(q.getNumber()).replace('.', ',') + ";" + q.getUnit() + "\n";
                 out.write(s.getBytes("UTF-8"));
             }
@@ -67,10 +67,6 @@ public abstract class RandomVariable {
         return new RandomVariableQuotient(this, other);
     }
 
-    public RandomVariable makePersistent() {
-        return new PersistentRandomVariable(this);
-    }
-
     public RandomVariable bound(final double lowerBound, final double upperBound) {
         return new RangeBoundRandomVariable(this, lowerBound, upperBound);
     }
@@ -87,7 +83,7 @@ public abstract class RandomVariable {
         final double[] numbers = new double[sampleCount];
         final RandomSource r = RandomSource.wrap(new Random(seed));
         for (int i = 0; i < sampleCount; i++) {
-            numbers[i] = this.observe(r, i).getNumber();
+            numbers[i] = this.observe(r, new SimulationRun()).getNumber();
         }
         return new Sample(numbers, this.getUnit());
     }
@@ -100,7 +96,7 @@ public abstract class RandomVariable {
         double sum = 0.0;
         final RandomSource r = RandomSource.wrap(new Random(seed));
         for (int i = 0; i < sampleCount; i++) {
-            sum += this.observe(r, i).getNumber();
+            sum += this.observe(r, new SimulationRun()).getNumber();
         }
         return new Mean(sum, sampleCount);
     }

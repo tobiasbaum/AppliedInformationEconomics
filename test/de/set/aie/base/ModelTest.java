@@ -24,9 +24,9 @@ public class ModelTest {
     @Test
     public void test() throws Exception {
         final Model m = new Model();
-        m.add("dir", Distributions.empirical(Unit.scalar(), -1.0, 1.0));
-        m.add("val", Distributions.shiftedExp(1.0, 10.0, Unit.of("EUR")));
-        m.add("combined", (final Instance i) -> i.get("dir").times(i.get("val")));
+        m.addRaw("dir", Distributions.empirical(Unit.scalar(), -1.0, 1.0));
+        m.addRaw("val", Distributions.shiftedExp(1.0, 10.0, Unit.of("EUR")));
+        m.addRaw("combined", (final Instance i) -> i.get("dir").times(i.get("val")));
 
         m.printValuesOfInformation(132, "combined");
     }

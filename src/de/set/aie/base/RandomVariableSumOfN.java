@@ -26,7 +26,7 @@ public class RandomVariableSumOfN extends RandomVariable {
     }
 
     @Override
-    public Quantity observe(final RandomSource r, final int run) {
+    public Quantity observe(final RandomSource r, final SimulationRun run) {
         final Quantity count = this.count.observe(r, run);
         final long max = Math.round(count.getNumber());
         double sum = 0.0;

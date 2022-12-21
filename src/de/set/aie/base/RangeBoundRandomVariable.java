@@ -28,7 +28,7 @@ public class RangeBoundRandomVariable extends RandomVariable {
     }
 
     @Override
-    public Quantity observe(final RandomSource r, final int run) {
+    public Quantity observe(final RandomSource r, final SimulationRun run) {
         final Quantity q = this.base.observe(r, run);
         if (q.getNumber() < this.lower) {
             return Quantity.of(this.lower, q.getUnit());
