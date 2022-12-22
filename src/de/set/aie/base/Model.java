@@ -70,10 +70,19 @@ public class Model {
             return v;
         }
 
-        public Map<String, Sample> createSamples(final long seed, final int sampleCount, final String[] valueVariables) {
-            final Map<String, Sample> samples = new LinkedHashMap<>();
+        public Map<String, double[]> createSamples(final long seed, final int sampleCount, final String[] valueVariables) {
+            final Map<String, double[]> samples = new LinkedHashMap<>();
             for (final String v : valueVariables) {
-                samples.put(v, this.get(v).sample(seed, sampleCount));
+                samples.put(v, new double[sampleCount]);
+            }
+            final RandomSource r1 = RandomSource.wrap(new Random(seed));
+            for (int i = 0; i < sampleCount; i++) {
+                final SimulationRun run = new SimulationRun();
+                for (final String v : valueVariables) {
+                    final RandomVariable r = this.get(v);
+                    final double[] numbers = samples.get(v);
+                    numbers[i] = r.observe(r1, run).getNumber();
+                }
             }
             return samples;
         }
@@ -126,17 +135,58 @@ public class Model {
     }
 
     public void analyze(final long seed, final String... valueVariables) {
-        System.out.println("=== Value variables");
+        final AnalysisResultHandler rh = new AnalysisResultHandler() {
+            @Override
+            public void handleValueVariables(Map<String, Sample> samples, String bestChoice) {
+                System.out.println("=== Value variables");
+                for (final Entry<String,Sample> e : samples.entrySet()) {
+                    System.out.println("For " + e.getKey() + " ...");
+                    System.out.println(e.getValue());
+                }
+
+                System.out.println("Choice with best expected value: " + bestChoice);
+                System.out.println();
+            }
+
+            @Override
+            public void handleVOI(int iter, Map<String, Mean> means, Map<String, String> types) {
+                final List<String> sorted = new ArrayList<>(means.keySet());
+                Collections.sort(sorted,
+                        (final String n1, final String n2) -> Double.compare(means.get(n2).get(), means.get(n1).get()));
+                System.out.println("=== Value of information (iter=" + iter + ")");
+                for (final String name : sorted) {
+                    System.out.println("value of information for " + types.get(name) + " " + name + ": " + means.get(name));
+                }
+                System.out.println();
+            }
+        };
+        this.analyze(seed, rh, valueVariables);
+    }
+
+    public static interface AnalysisResultHandler {
+
+        public abstract void handleValueVariables(Map<String, Sample> samples, String bestChoice);
+
+        public abstract void handleVOI(int iter, Map<String, Mean> means, Map<String, String> types);
+
+    }
+
+    public void analyze(final long seed, AnalysisResultHandler rh, final String... valueVariables) {
+        assert valueVariables.length >= 2;
         final Instance fullInstance = this.instantiate();
-        final Map<String, Sample> originalSamples = fullInstance.createSamples(seed, 10_000, valueVariables);
-        for (final Entry<String, Sample> e : originalSamples.entrySet()) {
-            System.out.println("For " + e.getKey() + " ...");
-            System.out.println(e.getValue());
+        final Map<String, double[]> originalSamples = fullInstance.createSamples(seed, 10_000, valueVariables);
+        final Map<String, Sample> originalSamplesWithUnits = new LinkedHashMap<>();
+        for (final Entry<String, double[]> e : originalSamples.entrySet()) {
+            originalSamplesWithUnits.put(e.getKey(), new Sample(e.getValue(), fullInstance.get(e.getKey()).getUnit()));
         }
 
         final String bestChoice = this.determineBestChoice(originalSamples);
-        System.out.println("Choice with best expected value: " + bestChoice);
-        System.out.println();
+        rh.handleValueVariables(originalSamplesWithUnits, bestChoice);
+
+        final Map<String, String> types = new LinkedHashMap<>();
+        for (final String name : this.map.keySet()) {
+            types.put(name, fullInstance.get(name).getType());
+        }
 
         final RandomSource sampleRandom = RandomSource.wrap(new Random(seed));
         final Map<String, Mean> meanLosses = new LinkedHashMap<>();
@@ -149,36 +199,35 @@ public class Model {
                 for (int i = 0; i < 10; i++) {
                     final long iterSeed = seed + i + 100 * j;
                     final Instance reducedInstance = this.createReducedInstance(name, sampleRandom);
-                    final Map<String, Sample> reducedSamples = reducedInstance.createSamples(iterSeed, 500, valueVariables);
+                    final Map<String, double[]> reducedSamples = reducedInstance.createSamples(iterSeed, 2_000, valueVariables);
                     final String bestChoiceWithInformation = this.determineBestChoice(reducedSamples);
-                    if (bestChoice.equals(bestChoiceWithInformation)) {
-                        meanLosses.compute(name, (final String k, final Mean v) -> v.add(0.0, 5_000));
-                    } else {
-                        final RandomVariable loss = reducedInstance.get(bestChoiceWithInformation).minus(reducedInstance.get(bestChoice));
-                        meanLosses.compute(name, (final String k, final Mean v) -> v.add(loss.mean(iterSeed, 5_000)));
-                    }
+                    final double[] loss = this.minus(reducedSamples.get(bestChoiceWithInformation), reducedSamples.get(bestChoice));
+                    meanLosses.compute(name, (final String k, final Mean v) -> v.add(Mean.of(loss)));
                 }
             }
             final long curTime = System.currentTimeMillis();
             if (curTime - lastPrintTime > 15_000) {
                 lastPrintTime = curTime;
-                final List<String> sorted = new ArrayList<>(this.map.keySet());
-                Collections.sort(sorted,
-                        (final String n1, final String n2) -> Double.compare(meanLosses.get(n2).get(), meanLosses.get(n1).get()));
-                System.out.println("=== Value of information (iter=" + j + ")");
-                for (final String name : sorted) {
-                    System.out.println("value of information for " + fullInstance.get(name).getType() + " " + name + ": " + meanLosses.get(name));
-                }
-                System.out.println();
+                rh.handleVOI(j, meanLosses, types);
             }
         }
+        rh.handleVOI(10_000, meanLosses, types);
     }
 
-    private String determineBestChoice(final Map<String, Sample> samples) {
+    private double[] minus(double[] ds1, double[] ds2) {
+        assert ds1.length == ds2.length;
+        final double[] ret = new double[ds1.length];
+        for (int i = 0; i < ds1.length; i++) {
+            ret[i] = ds1[i] - ds2[i];
+        }
+        return ret;
+    }
+
+    private String determineBestChoice(final Map<String, double[]> samples) {
         String bestName = null;
         double best = Double.NEGATIVE_INFINITY;
-        for (final Entry<String, Sample> e : samples.entrySet()) {
-            final double cur = e.getValue().mean();
+        for (final Entry<String, double[]> e : samples.entrySet()) {
+            final double cur = Mean.of(e.getValue()).get();
             if (cur > best) {
                 bestName = e.getKey();
                 best = cur;
@@ -187,6 +236,7 @@ public class Model {
         return bestName;
     }
 
+    @Deprecated
     public void printValuesOfInformation(final long seed, final String valueVariable)
         throws InterruptedException, ExecutionException {
 

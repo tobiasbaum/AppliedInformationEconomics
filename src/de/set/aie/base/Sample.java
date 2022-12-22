@@ -31,7 +31,7 @@ public class Sample {
     @Override
     public String toString() {
         final StringBuilder ret = new StringBuilder();
-        ret.append(format("Mean:    ", Quantity.of(this.mean(), this.unit))).append('\n');
+        ret.append(format("Mean:    ", this.meanQ())).append('\n');
         ret.append(format("Min:     ", Quantity.of(this.numbers[0], this.unit))).append('\n');
         ret.append(format("1. Quart:", Quantity.of(this.numbers[this.numbers.length / 4], this.unit))).append('\n');
         ret.append(format("Median:  ", Quantity.of(this.median(), this.unit))).append('\n');
@@ -45,11 +45,11 @@ public class Sample {
     }
 
     public Quantity meanQ() {
-        return Quantity.of(this.mean(), this.unit);
+        return Quantity.of(this.mean().get(), this.unit);
     }
 
-    public double mean() {
-        return Mean.of(this.numbers).get();
+    public Mean mean() {
+        return Mean.of(this.numbers);
     }
 
     public double median() {
