@@ -53,7 +53,7 @@ public class ModelTest {
     }
 
     @Test
-    public void test1() {
+    public void test1() throws Exception {
         final Model m = new Model();
         m.addRaw("dir", Distributions.empirical(Unit.scalar(), -1.0, 1.0));
         m.addRaw("val", Distributions.fixed(Quantity.of(10.0, Unit.of("EUR"))));
@@ -67,7 +67,7 @@ public class ModelTest {
     }
 
     @Test
-    public void test2() {
+    public void test2() throws Exception {
         final Model m = new Model();
         m.addRaw("dir", Distributions.empirical(Unit.scalar(), -1.0, 1.0));
         m.addRaw("val", Distributions.shiftedExp(1.0, 10.0, Unit.of("EUR")));

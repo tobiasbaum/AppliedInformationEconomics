@@ -59,9 +59,6 @@ public class TestModel {
         m.addRaw("notPlay", Distributions.fixed(Quantity.of(0, "EUR")));
 
         m.analyze(1234, "play", "notPlay");
-        System.out.println();
-
-        m.printValuesOfInformation(1234, "play");
     }
 
 }

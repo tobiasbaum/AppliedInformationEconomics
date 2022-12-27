@@ -33,6 +33,10 @@ public interface RandomSource {
             public double nextGaussian() {
                 return r.nextGaussian();
             }
+            @Override
+            public RandomSource spawnChild() {
+                return RandomSource.wrap(new Random(r.nextLong()));
+            }
         };
     }
 
@@ -42,8 +46,11 @@ public interface RandomSource {
 
     public abstract double nextGaussian();
 
+    public abstract RandomSource spawnChild();
+
     public default<T> T pickAtRandom(T[] array) {
         return array[this.nextInt(array.length)];
     }
+
 
 }

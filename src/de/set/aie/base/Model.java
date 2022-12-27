@@ -23,66 +23,79 @@ import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.Future;
 import java.util.function.Function;
 
 public class Model {
 
-    private static final int VOPI_SAMPLE_COUNT = 7_000;
-    private static final int VOI_SAMPLE_COUNT = 3_000;
-
     public class Instance {
-        private final Map<String, RandomVariable> vars = new LinkedHashMap<>();
-        private final Map<String, Object> objects = new HashMap();
+        private final ConcurrentHashMap<String, RandomVariable> vars = new ConcurrentHashMap<>();
+        private final ConcurrentHashMap<String, Object> objects = new ConcurrentHashMap<>();
 
         public RandomVariable get(final String name) {
-            if (this.vars.containsKey(name)) {
-                return this.vars.get(name);
+            final RandomVariable v = this.vars.get(name);
+            if (v != null) {
+                return v;
             }
             final Function<Instance, RandomVariable> f = Model.this.map.get(name);
             if (f == null) {
                 throw new IllegalStateException("no definition for " + name);
             }
-            final RandomVariable v = f.apply(this);
-            this.vars.put(name, v);
-            return v;
+            final RandomVariable newV = f.apply(this);
+            return this.vars.computeIfAbsent(name, (String n) -> newV);
         }
 
         public<T> T getObject(String name) {
-            if (this.objects.containsKey(name)) {
-                return (T) this.objects.get(name);
+            final T t = (T) this.objects.get(name);
+            if (t != null) {
+                return t;
             }
             final Function<Instance, Object> f = Model.this.objectMap.get(name);
             if (f == null) {
                 throw new IllegalStateException("no definition for object " + name);
             }
-            final T v = (T) f.apply(this);
-            this.objects.put(name, v);
-            return v;
+            final T newT = (T) f.apply(this);
+            return (T) this.objects.computeIfAbsent(name, (String n) -> newT);
         }
 
-        public Map<String, double[]> createSamples(final long seed, final int sampleCount, final String[] valueVariables) {
+        public Map<String, double[]> createSamples(final long seed, final int sampleCount, final String[] valueVariables)
+            throws InterruptedException, ExecutionException {
+
             final Map<String, double[]> samples = new LinkedHashMap<>();
             for (final String v : valueVariables) {
                 samples.put(v, new double[sampleCount]);
             }
             final RandomSource r1 = RandomSource.wrap(new Random(seed));
-            for (int i = 0; i < sampleCount; i++) {
-                final SimulationRun run = new SimulationRun();
-                for (final String v : valueVariables) {
-                    final RandomVariable r = this.get(v);
-                    final double[] numbers = samples.get(v);
-                    numbers[i] = r.observe(r1, run).getNumber();
-                }
+            final List<Future<?>> futures = new ArrayList<>();
+
+            for (int i = 0; i < sampleCount; i += 100) {
+                final int base = i;
+                final int max = Math.min(100, sampleCount - base);
+                final RandomSource rChild = r1.spawnChild();
+
+                final Future<?> f = ForkJoinPool.commonPool().submit(() -> {
+                    for (int j = 0; j < max; j++) {
+                        final SimulationRun run = new SimulationRun();
+                        for (final String v : valueVariables) {
+                            final RandomVariable r = this.get(v);
+                            final double[] numbers = samples.get(v);
+                            numbers[base + j] = r.observe(rChild, run).getNumber();
+                        }
+                    }
+                });
+                futures.add(f);
+            }
+            for (final Future<?> f : futures) {
+                f.get();
             }
             return samples;
         }
@@ -134,7 +147,9 @@ public class Model {
         return new Instance();
     }
 
-    public void analyze(final long seed, final String... valueVariables) {
+    public void analyze(final long seed, final String... valueVariables)
+        throws InterruptedException, ExecutionException {
+
         final AnalysisResultHandler rh = new AnalysisResultHandler() {
             @Override
             public void handleValueVariables(Map<String, Sample> samples, String bestChoice) {
@@ -145,6 +160,7 @@ public class Model {
                 }
 
                 System.out.println("Choice with best expected value: " + bestChoice);
+                System.out.println(new Date());
                 System.out.println();
             }
 
@@ -157,6 +173,7 @@ public class Model {
                 for (final String name : sorted) {
                     System.out.println("value of information for " + types.get(name) + " " + name + ": " + means.get(name));
                 }
+                System.out.println(new Date());
                 System.out.println();
             }
         };
@@ -171,7 +188,9 @@ public class Model {
 
     }
 
-    public void analyze(final long seed, AnalysisResultHandler rh, final String... valueVariables) {
+    public void analyze(final long seed, AnalysisResultHandler rh, final String... valueVariables)
+        throws InterruptedException, ExecutionException {
+
         assert valueVariables.length >= 2;
         final Instance fullInstance = this.instantiate();
         final Map<String, double[]> originalSamples = fullInstance.createSamples(seed, 10_000, valueVariables);
@@ -208,7 +227,7 @@ public class Model {
             final long curTime = System.currentTimeMillis();
             if (curTime - lastPrintTime > 15_000) {
                 lastPrintTime = curTime;
-                rh.handleVOI(j, meanLosses, types);
+                rh.handleVOI(j, new LinkedHashMap<>(meanLosses), types);
             }
         }
         rh.handleVOI(10_000, meanLosses, types);
@@ -236,62 +255,6 @@ public class Model {
         return bestName;
     }
 
-    @Deprecated
-    public void printValuesOfInformation(final long seed, final String valueVariable)
-        throws InterruptedException, ExecutionException {
-
-        System.out.println("Starting to calculate value of information ...");
-
-        final Instance originalInstance = this.instantiate();
-        final ExecutorService tp = Executors.newCachedThreadPool();
-        final Future<Quantity> valueOfPerfectInformation =
-                tp.submit(() -> this.determineMeanValueOfPerfectInformation(seed, originalInstance.get(valueVariable)));
-
-        final Map<String, Future<Quantity>> reducedVois = new LinkedHashMap<>();
-        final Instance typeInst = this.instantiate();
-        for (final String name : this.map.keySet()) {
-            reducedVois.put(typeInst.get(name).getType() + " " + name,
-                    tp.submit(() -> this.reduceAndDetermineMeanVOI(name, seed, valueVariable)));
-        }
-
-        System.out.println("value of perfect information: " + valueOfPerfectInformation.get());
-        final Map<String, Quantity> relativeVois = new LinkedHashMap<>();
-        for (final String nameAndType : reducedVois.keySet()) {
-            final Quantity valueOfInformationForReducedModel = reducedVois.get(nameAndType).get();
-            Quantity relativeValueOfInformation = valueOfPerfectInformation.get().minus(valueOfInformationForReducedModel);
-            if (relativeValueOfInformation.getNumber() < 0) {
-                relativeValueOfInformation = Quantity.of(0, relativeValueOfInformation.getUnit());
-            }
-            relativeVois.put(nameAndType, relativeValueOfInformation);
-        }
-        final List<String> keys = new ArrayList<>(relativeVois.keySet());
-        Collections.sort(keys, (final String k1, final String k2) ->
-            Double.compare(relativeVois.get(k2).getNumber(), relativeVois.get(k1).getNumber()));
-        for (final String key : keys) {
-            System.out.println("value of information for " + key + ": " + relativeVois.get(key));
-        }
-    }
-
-    private Quantity determineMeanValueOfPerfectInformation(final long seed, final RandomVariable randomVariable) {
-        double sum = 0.0;
-        for (int i = 0; i < VOI_SAMPLE_COUNT; i++) {
-            final Quantity voi = this.determineValueOfPerfectInformation(seed + i, randomVariable);
-            sum += voi.getNumber();
-        }
-        return Quantity.of(sum / VOI_SAMPLE_COUNT, randomVariable.getUnit());
-    }
-
-    private Quantity reduceAndDetermineMeanVOI(final String toReduce, final long seed, final String valueVariable) {
-        double sum = 0.0;
-        final RandomSource sampleRandom = RandomSource.wrap(new Random(seed));
-        for (int i = 0; i < VOI_SAMPLE_COUNT; i++) {
-            final Instance reducedInstance = this.createReducedInstance(toReduce, sampleRandom);
-            final Quantity voi = this.determineValueOfPerfectInformation(seed + i, reducedInstance.get(valueVariable));
-            sum += voi.getNumber();
-        }
-        return Quantity.of(sum / VOI_SAMPLE_COUNT, this.instantiate().get(valueVariable).getUnit());
-    }
-
     private Instance createReducedInstance(final String toReduce, final RandomSource sampleRandom) {
         final Quantity sample = this.sampleValue(toReduce, sampleRandom);
         final Instance reducedInstance = this.instantiate();
@@ -301,38 +264,6 @@ public class Model {
 
     private Quantity sampleValue(final String toReduce, final RandomSource sampleRandom) {
         return this.instantiate().get(toReduce).observe(sampleRandom, new SimulationRun());
-    }
-
-    private Quantity determineValueOfPerfectInformation(final long seed, final RandomVariable randomVariable) {
-        final RandomSource r = RandomSource.wrap(new Random(seed));
-        double costOfWrongDecision1 = 0.0;
-        int count1 = 0;
-        double costOfWrongDecision2 = 0.0;
-        int count2 = 0;
-
-        for (int i = 0; i < VOPI_SAMPLE_COUNT; i++) {
-            final double result = randomVariable.observe(r, new SimulationRun()).getNumber();
-            if (result < 0) {
-                costOfWrongDecision1 += -result;
-                count1++;
-            } else {
-                costOfWrongDecision2 += result;
-                count2++;
-            }
-        }
-
-        if (count1 == 0 || count2 == 0) {
-            return Quantity.of(0, randomVariable.getUnit());
-        }
-
-        final double expectedValue1 = costOfWrongDecision1 / count1;
-        final double expectedValue2 = costOfWrongDecision2 / count2;
-
-        if (expectedValue1 < expectedValue2) {
-            return Quantity.of(expectedValue1, randomVariable.getUnit());
-        } else {
-            return Quantity.of(expectedValue2, randomVariable.getUnit());
-        }
     }
 
     public List<String> getAllPersistentVariables() throws AssertionError {
