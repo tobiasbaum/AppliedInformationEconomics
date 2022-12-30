@@ -20,12 +20,15 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
@@ -277,6 +280,28 @@ public class Model {
         return allPersistentVariables;
     }
 
+    public void printDistributions(final File file, final long seed) throws IOException {
+        final List<String> cols = this.getAllPersistentVariables();
+        cols.addAll(this.getAdditionalPersistedValues(seed, cols));
+
+        this.printDistributions(file, seed, cols);
+    }
+
+    private Collection<? extends String> getAdditionalPersistedValues(long seed, List<String> cols) {
+        final Instance inst = this.instantiate();
+        final SimulationRun run = new SimulationRun();
+        final RandomSource r = RandomSource.wrap(new Random(seed));
+
+        for (final String col : cols) {
+            inst.get(col).observe(r, run);
+        }
+
+        final List<String> ret = new ArrayList<>(run.getPersistentValueNames());
+        ret.removeAll(cols);
+        Collections.sort(ret);
+        return ret;
+    }
+
     public void printDistributions(final File file, final long seed, final Collection<String> columns) throws IOException {
         this.printDistributions(file, seed, columns.toArray(new String[columns.size()]));
     }
@@ -298,6 +323,8 @@ public class Model {
                 }
             }
             w.write('\n');
+            final DecimalFormat df = new DecimalFormat("0", DecimalFormatSymbols.getInstance(Locale.GERMAN));
+            df.setMaximumFractionDigits(5);
             for (int i = 0; i < 10_000; i++) {
                 w.write(Integer.toString(i));
                 final SimulationRun run = new SimulationRun();
@@ -307,7 +334,7 @@ public class Model {
                 for (final String colName : columns) {
                     final Quantity q = run.getPersistentValue(colName);
                     w.write(';');
-                    w.write(Double.toString(q.getNumber()).replace('.', ','));
+                    w.write(df.format(q.getNumber()));
                 }
                 w.write('\n');
             }

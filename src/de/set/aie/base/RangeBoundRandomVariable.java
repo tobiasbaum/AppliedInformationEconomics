@@ -29,14 +29,25 @@ public class RangeBoundRandomVariable extends RandomVariable {
 
     @Override
     public Quantity observe(final RandomSource r, final SimulationRun run) {
-        final Quantity q = this.base.observe(r, run);
-        if (q.getNumber() < this.lower) {
-            return Quantity.of(this.lower, q.getUnit());
+        int count = 0;
+        while (true) {
+            final Quantity q = this.base.observe(r, run);
+            if (q.getNumber() < this.lower) {
+                if (count > 10) {
+                    return Quantity.of(this.lower, q.getUnit());
+                } else {
+                    count++;
+                }
+            } else if (q.getNumber() > this.upper) {
+                if (count > 10) {
+                    return Quantity.of(this.upper, q.getUnit());
+                } else {
+                    count++;
+                }
+            } else {
+                return q;
+            }
         }
-        if (q.getNumber() > this.upper) {
-            return Quantity.of(this.upper, q.getUnit());
-        }
-        return q;
     }
 
     @Override

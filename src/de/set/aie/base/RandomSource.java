@@ -52,5 +52,9 @@ public interface RandomSource {
         return array[this.nextInt(array.length)];
     }
 
+    public default boolean nextBool(double propabilityForTrue) {
+        return this.nextDouble() < propabilityForTrue;
+    }
+
 
 }

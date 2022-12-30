@@ -15,13 +15,14 @@
  */
 package de.set.aie.base;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 
 public class SimulationRun {
 
-    private final Map<String, Quantity> values = new HashMap<>();
-    private final Map<String, Object> objects = new HashMap<>();
+    private final Map<String, Quantity> values = new LinkedHashMap<>();
+    private final Map<String, Object> objects = new LinkedHashMap<>();
 
     public boolean hasPersistentValue(String name) {
         return this.values.containsKey(name);
@@ -55,6 +56,10 @@ public class SimulationRun {
             throw new AssertionError("object was not persisted: " + name);
         }
         return q;
+    }
+
+    public Set<? extends String> getPersistentValueNames() {
+        return this.values.keySet();
     }
 
 }
