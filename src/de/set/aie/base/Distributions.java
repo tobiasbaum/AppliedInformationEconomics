@@ -99,8 +99,8 @@ public class Distributions {
 
     public static LogNormalRandomVariable logNormal(final double lower95, final double upper95, final Unit unit) {
         assert lower95 < upper95;
-        assert 0.0 < lower95;
-        final double normalLower95 = Math.log(lower95);
+        assert 0.0 <= lower95;
+        final double normalLower95 = lower95 > 0.0 ? Math.log(lower95) : 0.0;
         final double normalUpper95 = Math.log(upper95);
         final double mean = (normalLower95 + normalUpper95) / 2.0;
         final double sd = (normalUpper95 - normalLower95)  / 1.645 / 2.0;
@@ -165,6 +165,10 @@ public class Distributions {
                 Quantity.of(params.upper, unit));
     }
 
+    public static MultiVariableFactory unknown(List<Between> ranges, final Unit unit) {
+        return unknown(EnumSet.allOf(StdDist.class), Double.NEGATIVE_INFINITY, ranges, Double.POSITIVE_INFINITY, unit);
+    }
+
     public static MultiVariableFactory unknown(final double lower, final double upper, final Unit unit) {
         return unknown(Double.NEGATIVE_INFINITY, lower, upper, Double.POSITIVE_INFINITY, unit);
     }
@@ -175,7 +179,8 @@ public class Distributions {
             final double upper,
             final double absoluteMax,
             final Unit unit) {
-        return unknown(EnumSet.allOf(StdDist.class), absoluteMin, lower, upper, absoluteMax, unit);
+        final EnumSet<StdDist> distributions = EnumSet.allOf(StdDist.class);
+        return unknown(distributions, absoluteMin, lower, upper, absoluteMax, unit);
     }
 
     public static MultiVariableFactory unknown(
@@ -200,5 +205,28 @@ public class Distributions {
             final double absoluteMax,
             final Unit unit) {
         return new UnknownDistFactory(possibleDistributions, absoluteMin, estimatedRanges, absoluteMax, unit);
+    }
+
+    /**
+     * Liefert die Verteilung für die Anzahl der Elemente der Grundgesamtheit mit einer Eigenschaft X, wenn
+     * in einer zufälligen Stichprobe eine bestimmte Anzahl von Elementen mit X beobachtet wurden.
+     *
+     * Siehe auch https://stats.stackexchange.com/questions/311088/beta-binomial-as-conjugate-to-hypergeometric
+     *
+     * @param populationSize Anzahl der Elemente in der Grundgesamtheit.
+     * @param sampleSize Anzahl der Elemente in der Stichprobe.
+     * @param positiveInSample Anzahl der Elemente in der Stichprobe mit Eigenschaft X
+     */
+    public static BetaBinomialRandomVariable extrapolateFromSample(
+            int populationSize, int sampleSize, int positiveInSample, Unit unit) {
+        assert sampleSize <= populationSize;
+        assert positiveInSample <= sampleSize;
+        assert positiveInSample >= 0;
+        return new BetaBinomialRandomVariable(
+                populationSize - sampleSize,
+                1 + positiveInSample,
+                1 + sampleSize - positiveInSample,
+                positiveInSample,
+                unit);
     }
 }

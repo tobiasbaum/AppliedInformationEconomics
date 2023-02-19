@@ -76,4 +76,14 @@ class UnknownDistFactory implements MultiVariableFactory {
         return ret;
     }
 
+    @Override
+    public MultiVariableFactory bound(double lowerBound, double upperBound) {
+        return new UnknownDistFactory(
+                this.possibleDistributions,
+                Math.max(this.absoluteMin, lowerBound),
+                this.estimatedRanges,
+                Math.min(this.absoluteMax, upperBound),
+                this.unit);
+    }
+
 }
