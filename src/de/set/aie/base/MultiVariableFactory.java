@@ -26,4 +26,8 @@ public interface MultiVariableFactory {
 
     public abstract MultiVariableFactory bound(double lowerBound, double upperBound);
 
+    public default MultiVariableFactory nonNegative() {
+        return this.bound(0, Double.POSITIVE_INFINITY);
+    }
+
 }
