@@ -22,6 +22,8 @@ import java.util.Set;
 
 public class Distributions {
 
+    static final double NORMAL_TAIL_FACTOR = 1.645;
+
     public enum StdDist {
         NORMAL {
             @Override
@@ -90,11 +92,19 @@ public class Distributions {
         return new SingleMode(lower, mode, upper);
     }
 
+    public static NormalRandomVariable normal(final Between range90, final Unit unit) {
+        return normal(range90.lower, range90.upper, unit);
+    }
+
     public static NormalRandomVariable normal(final double lower95, final double upper95, final Unit unit) {
         assert lower95 < upper95;
         final double mean = (lower95 + upper95) / 2.0;
-        final double sd = (upper95 - lower95)  / 1.645 / 2.0;
+        final double sd = (upper95 - lower95)  / NORMAL_TAIL_FACTOR / 2.0;
         return new NormalRandomVariable(mean, sd, unit);
+    }
+
+    public static NormalCombRandomVariable normalComb(final SingleMode params, final Unit unit) {
+        return new NormalCombRandomVariable(params.lower, params.mode, params.upper, unit);
     }
 
     public static LogNormalRandomVariable logNormal(final double lower95, final double upper95, final Unit unit) {
@@ -103,7 +113,7 @@ public class Distributions {
         final double normalLower95 = lower95 > 0.0 ? Math.log(lower95) : 0.0;
         final double normalUpper95 = Math.log(upper95);
         final double mean = (normalLower95 + normalUpper95) / 2.0;
-        final double sd = (normalUpper95 - normalLower95)  / 1.645 / 2.0;
+        final double sd = (normalUpper95 - normalLower95)  / NORMAL_TAIL_FACTOR / 2.0;
         return new LogNormalRandomVariable(mean, sd, unit);
     }
 

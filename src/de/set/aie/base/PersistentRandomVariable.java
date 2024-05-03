@@ -27,12 +27,16 @@ public class PersistentRandomVariable extends RandomVariable {
 
     @Override
     public Quantity observe(final RandomSource r, final SimulationRun run) {
-        if (!run.hasPersistentValue(this.name)) {
-            final Quantity v = this.base.observe(r, run);
-            run.persist(this.name, v);
-            return v;
-        } else {
-            return run.getPersistentValue(this.name);
+        try {
+            if (!run.hasPersistentValue(this.name)) {
+                final Quantity v = this.base.observe(r, run);
+                run.persist(this.name, v);
+                return v;
+            } else {
+                return run.getPersistentValue(this.name);
+            }
+        } catch (final Throwable t) {
+            throw new RuntimeException("problem with " + this.name, t);
         }
     }
 

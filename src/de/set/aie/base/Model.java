@@ -23,15 +23,19 @@ import java.io.OutputStreamWriter;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
+import java.util.Set;
+import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ForkJoinPool;
@@ -70,7 +74,7 @@ public class Model {
             return (T) this.objects.computeIfAbsent(name, (String n) -> newT);
         }
 
-        public Map<String, double[]> createSamples(final long seed, final int sampleCount, final String[] valueVariables)
+        public Map<String, double[]> createSamples(final long seed, final int sampleCount, final String... valueVariables)
             throws InterruptedException, ExecutionException {
 
             final Map<String, double[]> samples = new LinkedHashMap<>();
@@ -168,6 +172,18 @@ public class Model {
             }
 
             @Override
+            public void handleVariableOverview(Map<String, Sample> samples) {
+                System.out.println("=== Remaining variable overview");
+                for (final Entry<String,Sample> e : samples.entrySet()) {
+                    System.out.println("For " + e.getKey() + " ...");
+                    System.out.println(e.getValue());
+                }
+
+                System.out.println(new Date());
+                System.out.println();
+            }
+
+            @Override
             public void handleVOI(int iter, Map<String, Mean> means, Map<String, String> types) {
                 final List<String> sorted = new ArrayList<>(means.keySet());
                 Collections.sort(sorted,
@@ -187,6 +203,8 @@ public class Model {
 
         public abstract void handleValueVariables(Map<String, Sample> samples, String bestChoice);
 
+        public abstract void handleVariableOverview(Map<String, Sample> samples);
+
         public abstract void handleVOI(int iter, Map<String, Mean> means, Map<String, String> types);
 
     }
@@ -204,6 +222,16 @@ public class Model {
 
         final String bestChoice = this.determineBestChoice(originalSamples);
         rh.handleValueVariables(originalSamplesWithUnits, bestChoice);
+
+        final Map<String, Sample> otherVarSamples = new TreeMap<>();
+        final Set<String> vvSet = new HashSet<>(Arrays.asList(valueVariables));
+        for (final String var : this.map.keySet()) {
+            if (!vvSet.contains(var)) {
+                final double[] sample = fullInstance.createSamples(seed, 10_000, var).get(var);
+                otherVarSamples.put(var, new Sample(sample, fullInstance.get(var).getUnit()));
+            }
+        }
+        rh.handleVariableOverview(otherVarSamples);
 
         final Map<String, String> types = new LinkedHashMap<>();
         for (final String name : this.map.keySet()) {

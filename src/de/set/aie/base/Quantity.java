@@ -17,7 +17,7 @@ package de.set.aie.base;
 
 import java.util.Locale;
 
-public class Quantity {
+public class Quantity implements Comparable<Quantity> {
 
     private final double value;
     private final Unit unit;
@@ -69,6 +69,14 @@ public class Quantity {
         }
         final Quantity other = (Quantity) o;
         return this.value == other.value && this.unit.equals(other.unit);
+    }
+
+    @Override
+    public int compareTo(Quantity other) {
+        if (!this.unit.equals(other.unit)) {
+            throw new IllegalArgumentException("Incompatible units: " + this.unit + " vs " + other.unit);
+        }
+        return Double.compare(this.value, other.value);
     }
 
     @Override
