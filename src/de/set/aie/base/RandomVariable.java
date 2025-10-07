@@ -43,6 +43,10 @@ public abstract class RandomVariable {
         return new RandomVariableDifference(this, other);
     }
 
+    public RandomVariable max(final RandomVariable other) {
+        return new RandomVariableMax(this, other);
+    }
+
     public RandomVariable times(final RandomVariable other) {
         return new RandomVariableProduct(this, other);
     }
@@ -65,6 +69,10 @@ public abstract class RandomVariable {
 
     public RandomVariable div(final RandomVariable other) {
         return new RandomVariableQuotient(this, other);
+    }
+
+    public RandomVariable lessThan(FixedRandomVariable other) {
+        return new RandomVariableLessThan(this, other);
     }
 
     public RandomVariable bound(final double lowerBound, final double upperBound) {

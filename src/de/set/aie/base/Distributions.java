@@ -54,6 +54,12 @@ public class Distributions {
             public RandomVariable create(final Between range, final Unit unit) {
                 return block(range.lower, range.upper, unit);
             }
+        },
+        FIXED {
+            @Override
+            public RandomVariable create(final Between range, final Unit unit) {
+                return fixed(Quantity.of((range.lower + range.upper) / 2, unit));
+            }
         };
 
         public abstract RandomVariable create(Between range, Unit unit);
@@ -129,6 +135,10 @@ public class Distributions {
         return new FixedRandomVariable(q);
     }
 
+    public static FixedRandomVariable fixed(final double value, Unit unit) {
+        return fixed(Quantity.of(value, unit));
+    }
+
     public static RandomVariable empirical(final Unit unit, final double... values) {
         return new EmpiricalRandomVariable(unit, values);
     }
@@ -157,6 +167,9 @@ public class Distributions {
         return new ConditionalDistribution(v1Prop, v1, v2);
     }
 
+    /**
+     * Liefert mit der Wahrscheinlichkeit v1Prop den Wert von v1, sonst den Wert von v2.
+     */
     public static RandomVariable conditional(final RandomVariable v1Prop, final RandomVariable v1, final RandomVariable v2) {
         return new ConditionalDistribution(v1Prop, v1, v2);
     }

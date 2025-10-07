@@ -49,6 +49,13 @@ public class Quantity implements Comparable<Quantity> {
         return new Quantity(this.value - other.value, this.unit);
     }
 
+    public Quantity max(final Quantity other) {
+        if (!this.unit.equals(other.unit)) {
+            throw new AssertionError("incompatible units: " + this.unit + " vs " + other.unit);
+        }
+        return this.getNumber() >= other.getNumber() ? this : other;
+    }
+
     public Quantity times(final Quantity other) {
         return new Quantity(this.value * other.value, this.unit.times(other.unit));
     }
