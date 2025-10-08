@@ -65,6 +65,23 @@ public class Distributions {
         public abstract RandomVariable create(Between range, Unit unit);
     }
 
+    public enum StdDist3 {
+        NORMAL_COMB {
+            @Override
+            public RandomVariable create(final SingleMode range, final Unit unit) {
+                return normalComb(range, unit);
+            }
+        },
+        TRIANGLE {
+            @Override
+            public RandomVariable create(final SingleMode range, final Unit unit) {
+                return triangleAbsolute(range, unit);
+            }
+        };
+
+        public abstract RandomVariable create(SingleMode range, Unit unit);
+    }
+
     public static class Between {
         private final double lower;
         private final double upper;

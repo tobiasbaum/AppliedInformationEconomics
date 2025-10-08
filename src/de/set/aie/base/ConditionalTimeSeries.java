@@ -7,25 +7,30 @@ import java.util.function.Function;
  */
 public class ConditionalTimeSeries extends TimeSeries {
 
-    private final String v1prop;
+    private static final RandomVariable TRUE = Distributions.fixed(1, Unit.scalar());
+    private static final RandomVariable FALSE = Distributions.fixed(0, Unit.scalar());
+
+    private final String decision;
     private final TimeSeries v1;
     private final TimeSeries v2;
 
-    public ConditionalTimeSeries(String v1prop, TimeSeries v1, TimeSeries v2) {
-        this.v1prop = v1prop;
+    public ConditionalTimeSeries(Model m, String v1prop, TimeSeries v1, TimeSeries v2) {
+        this.decision = v1prop + "_decision";
+        // Damit für jeden Zeitpunkt die gleiche Zeitreihe kommt, muss die Entscheidung
+        // persistent sein. Deshalb wird hier eine entsprechende Variable eingeführt.
+        m.add(this.decision, (Model.Instance inst) ->
+                Distributions.conditional(inst.get(v1prop), TRUE, FALSE));
         this.v1 = v1;
         this.v2 = v2;
     }
 
     @Override
     public Function<Model.Instance, RandomVariable> getFor(int time) {
-        // nur wenn v1prop persistent ist, kommt sicher immer die komplette Zeitreihe 1 oder 2; sonst kann Mischmasch
-        // passieren
         return (Model.Instance inst) ->
                 Distributions.conditional(
-                        inst.get(v1prop),
-                        v1.getFor(time).apply(inst),
-                        v2.getFor(time).apply(inst)
+                    inst.get(decision),
+                    v1.getFor(time).apply(inst),
+                    v2.getFor(time).apply(inst)
                 );
     }
 }
