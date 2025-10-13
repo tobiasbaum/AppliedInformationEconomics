@@ -22,7 +22,7 @@ import de.set.aie.base.Model.Instance;
 
 public interface MultiVariableFactory {
 
-    public abstract Map<String, Function<Instance, RandomVariable>> create(String baseName);
+    public abstract Map<VarId, Function<Instance, RandomVariable>> create(VarId baseName);
 
     public abstract MultiVariableFactory bound(double lowerBound, double upperBound);
 

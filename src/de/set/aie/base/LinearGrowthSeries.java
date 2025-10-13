@@ -6,10 +6,10 @@ import java.util.function.Function;
  * Zeitreihe für lineares Wachstum.
  */
 public class LinearGrowthSeries extends TimeSeries {
-    private final String base;
-    private final String growth;
+    private final VarId base;
+    private final VarId growth;
 
-    public LinearGrowthSeries(String base, String growth) {
+    public LinearGrowthSeries(VarId base, VarId growth) {
         this.base = base;
         this.growth = growth;
     }

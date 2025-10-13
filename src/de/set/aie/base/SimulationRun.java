@@ -21,19 +21,19 @@ import java.util.Set;
 
 public class SimulationRun {
 
-    private final Map<String, Quantity> values = new LinkedHashMap<>();
+    private final Map<VarId, Quantity> values = new LinkedHashMap<>();
     private final Map<String, Object> objects = new LinkedHashMap<>();
 
-    public boolean hasPersistentValue(String name) {
+    public boolean hasPersistentValue(VarId name) {
         return this.values.containsKey(name);
     }
 
-    public void persist(String name, Quantity v) {
+    public void persist(VarId name, Quantity v) {
         assert !this.values.containsKey(name);
         this.values.put(name, v);
     }
 
-    public Quantity getPersistentValue(String name) {
+    public Quantity getPersistentValue(VarId name) {
         final Quantity q = this.values.get(name);
         if (q == null) {
             throw new AssertionError("variable was not persisted: " + name);
@@ -58,7 +58,7 @@ public class SimulationRun {
         return q;
     }
 
-    public Set<? extends String> getPersistentValueNames() {
+    public Set<? extends VarId> getPersistentValueNames() {
         return this.values.keySet();
     }
 

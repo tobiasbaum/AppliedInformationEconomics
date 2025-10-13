@@ -52,7 +52,7 @@ class UnknownDistFactory implements MultiVariableFactory {
     }
 
     @Override
-    public Map<String, Function<Instance, RandomVariable>> create(final String baseName) {
+    public Map<VarId, Function<Instance, RandomVariable>> create(final VarId baseName) {
         final List<RandomVariable> vars = new ArrayList<>();
         for (final StdDist dist : this.possibleDistributions) {
             for (final Between range : this.estimatedRanges) {
@@ -63,14 +63,14 @@ class UnknownDistFactory implements MultiVariableFactory {
         for (int i = 0; i <  indices.length; i++) {
             indices[i] = i;
         }
-        final Map<String, Function<Instance, RandomVariable>> ret = new LinkedHashMap<>();
-        final String distName = baseName + "_dist"; //$NON-NLS-1$
+        final Map<VarId, Function<Instance, RandomVariable>> ret = new LinkedHashMap<>();
+        final VarId distName = baseName.subvar("dist"); //$NON-NLS-1$
         ret.put(distName,
                 (final Instance m) -> PersistentRandomVariable.ensurePersistent(distName,
                         Distributions.empirical(Unit.scalar(), indices)));
         ret.put(baseName, (final Instance m) ->
             new UncertainDistributionVariable(
-                    m.get(baseName + "_dist"), //$NON-NLS-1$
+                    m.get(distName), //$NON-NLS-1$
                     vars.toArray(new RandomVariable[vars.size()]))
             .bound(this.absoluteMin, this.absoluteMax));
         return ret;

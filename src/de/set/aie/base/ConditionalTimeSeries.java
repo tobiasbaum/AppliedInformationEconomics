@@ -10,12 +10,12 @@ public class ConditionalTimeSeries extends TimeSeries {
     private static final RandomVariable TRUE = Distributions.fixed(1, Unit.scalar());
     private static final RandomVariable FALSE = Distributions.fixed(0, Unit.scalar());
 
-    private final String decision;
+    private final VarId decision;
     private final TimeSeries v1;
     private final TimeSeries v2;
 
-    public ConditionalTimeSeries(Model m, String v1prop, TimeSeries v1, TimeSeries v2) {
-        this.decision = v1prop + "_decision";
+    public ConditionalTimeSeries(Model m, VarId v1prop, TimeSeries v1, TimeSeries v2) {
+        this.decision = v1prop.subvar("decision");
         // Damit für jeden Zeitpunkt die gleiche Zeitreihe kommt, muss die Entscheidung
         // persistent sein. Deshalb wird hier eine entsprechende Variable eingeführt.
         m.add(this.decision, (Model.Instance inst) ->

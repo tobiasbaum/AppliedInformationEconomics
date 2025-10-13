@@ -10,9 +10,9 @@ import java.util.function.Function;
 public class TransformedTimeSeriesVar extends TimeSeries {
     private BiFunction<RandomVariable, RandomVariable, RandomVariable> transformer;
     private TimeSeries s1;
-    private String otherVarName;
+    private VarId otherVarName;
 
-    public TransformedTimeSeriesVar(TimeSeries s1, String otherVarName,
+    public TransformedTimeSeriesVar(TimeSeries s1, VarId otherVarName,
                                     BiFunction<RandomVariable, RandomVariable, RandomVariable> transformer) {
         this.transformer = transformer;
         this.s1 = s1;

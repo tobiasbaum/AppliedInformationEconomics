@@ -8,10 +8,10 @@ import java.util.function.Function;
  */
 public class ShrinkAfterTimeSeries extends TimeSeries {
     private final TimeSeries base;
-    private final String yearsUntil;
-    private final String shrinkRate;
+    private final VarId yearsUntil;
+    private final VarId shrinkRate;
 
-    public ShrinkAfterTimeSeries(TimeSeries base, String yearsUntil, String shrinkRate) {
+    public ShrinkAfterTimeSeries(TimeSeries base, VarId yearsUntil, VarId shrinkRate) {
         this.base = base;
         this.yearsUntil = yearsUntil;
         this.shrinkRate = shrinkRate;

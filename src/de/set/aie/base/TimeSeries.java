@@ -54,14 +54,14 @@ public abstract class TimeSeries {
     /**
      * Quotient aus einer Zeitreihe und einer Zufallsvariable.
      */
-    public TimeSeries div(String factor) {
+    public TimeSeries div(VarId factor) {
         return new TransformedTimeSeriesVar(this, factor, RandomVariable::div);
     }
 
     /**
      * Produkt aus einer Zeitreihe und einer Zufallsvariable.
      */
-    public TimeSeries times(String factor) {
+    public TimeSeries times(VarId factor) {
         return new TransformedTimeSeriesVar(this, factor, RandomVariable::times);
     }
 
@@ -83,7 +83,7 @@ public abstract class TimeSeries {
     /**
      * Liefert eine Zeitreihe, die ab dem übergebenen Zeitpunkt mit der übergebenen Rate schrumpft.
      */
-    public TimeSeries shrinkAfter(String yearsUntil, String shrinkRate) {
+    public TimeSeries shrinkAfter(VarId yearsUntil, VarId shrinkRate) {
         return new ShrinkAfterTimeSeries(this, yearsUntil, shrinkRate);
     }
 

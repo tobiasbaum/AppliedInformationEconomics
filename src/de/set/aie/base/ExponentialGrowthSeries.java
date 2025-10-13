@@ -6,10 +6,10 @@ import java.util.function.Function;
  * Zeitreihe für exponentielles Wachstum.
  */
 public class ExponentialGrowthSeries extends TimeSeries {
-    private final String base;
-    private final String growthRate;
+    private final VarId base;
+    private final VarId growthRate;
 
-    public ExponentialGrowthSeries(String base, String growthRate) {
+    public ExponentialGrowthSeries(VarId base, VarId growthRate) {
         this.base = base;
         this.growthRate = growthRate;
     }

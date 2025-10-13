@@ -31,25 +31,25 @@ public class ModelTest {
 
     private static final class VoiResultChecker implements AnalysisResultHandler {
 
-        private Map<String, Mean> lastVois;
+        private Map<VarId, Mean> lastVois;
 
         @Override
-        public void handleValueVariables(Map<String, Sample> samples, String bestChoice) {
+        public void handleValueVariables(Map<VarId, Sample> samples, VarId bestChoice) {
         }
 
         @Override
-        public void handleVariableOverview(Map<String, Sample> samples) {
+        public void handleVariableOverview(Map<VarId, Sample> samples) {
         }
 
         @Override
-        public void handleVOI(int iter, Map<String, Mean> means, Map<String, String> types) {
+        public void handleVOI(int iter, Map<VarId, Mean> means, Map<VarId, String> types) {
             for (final Mean m : means.values()) {
                 assertThat(m.get(), greaterThanOrEqualTo(0.0));
             }
             this.lastVois = means;
         }
 
-        public void checkVoiIsApprox(String name, double expected) {
+        public void checkVoiIsApprox(VarId name, double expected) {
             assertThat(this.lastVois.get(name).get(), greaterThanOrEqualTo(expected - 0.2));
             assertThat(this.lastVois.get(name).get(), lessThanOrEqualTo(expected + 0.2));
         }
@@ -59,29 +59,29 @@ public class ModelTest {
     @Test
     public void test1() throws Exception {
         final Model m = new Model();
-        m.addRaw("dir", Distributions.empirical(Unit.scalar(), -1.0, 1.0));
-        m.addRaw("val", Distributions.fixed(Quantity.of(10.0, Unit.of("EUR"))));
-        m.addRaw("combined", (final Instance i) -> i.get("dir").times(i.get("val")));
-        m.addRaw("zero", Distributions.fixed(Quantity.of(0, Unit.of("EUR"))));
+        m.addRaw(VarId.of("dir"), Distributions.empirical(Unit.scalar(), -1.0, 1.0));
+        m.addRaw(VarId.of("val"), Distributions.fixed(Quantity.of(10.0, Unit.of("EUR"))));
+        m.addRaw(VarId.of("combined"), (final Instance i) -> i.get(VarId.of("dir")).times(i.get(VarId.of("val"))));
+        m.addRaw(VarId.of("zero"), Distributions.fixed(Quantity.of(0, Unit.of("EUR"))));
 
         final VoiResultChecker ch = new VoiResultChecker();
-        m.analyze(132, ch, "combined", "zero");
-        ch.checkVoiIsApprox("dir", 5.0);
-        ch.checkVoiIsApprox("val", 0.0);
+        m.analyze(132, ch, VarId.of("combined"), VarId.of("zero"));
+        ch.checkVoiIsApprox(VarId.of("dir"), 5.0);
+        ch.checkVoiIsApprox(VarId.of("val"), 0.0);
     }
 
     @Test
     public void test2() throws Exception {
         final Model m = new Model();
-        m.addRaw("dir", Distributions.empirical(Unit.scalar(), -1.0, 1.0));
-        m.addRaw("val", Distributions.shiftedExp(1.0, 10.0, Unit.of("EUR")));
-        m.addRaw("combined", (final Instance i) -> i.get("dir").times(i.get("val")));
-        m.addRaw("zero", Distributions.fixed(Quantity.of(0, Unit.of("EUR"))));
+        m.addRaw(VarId.of("dir"), Distributions.empirical(Unit.scalar(), -1.0, 1.0));
+        m.addRaw(VarId.of("val"), Distributions.shiftedExp(1.0, 10.0, Unit.of("EUR")));
+        m.addRaw(VarId.of("combined"), (final Instance i) -> i.get(VarId.of("dir")).times(i.get(VarId.of("val"))));
+        m.addRaw(VarId.of("zero"), Distributions.fixed(Quantity.of(0, Unit.of("EUR"))));
 
         final VoiResultChecker ch = new VoiResultChecker();
-        m.analyze(132, ch, "combined", "zero");
-        ch.checkVoiIsApprox("dir", 2.5);
-        ch.checkVoiIsApprox("val", 0.0);
+        m.analyze(132, ch, VarId.of("combined"), VarId.of("zero"));
+        ch.checkVoiIsApprox(VarId.of("dir"), 2.5);
+        ch.checkVoiIsApprox(VarId.of("val"), 0.0);
     }
 
 }

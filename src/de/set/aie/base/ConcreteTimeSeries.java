@@ -19,10 +19,10 @@ public class ConcreteTimeSeries extends TimeSeries {
         LAST
     }
 
-    private final List<String> vars = new ArrayList<>();
+    private final List<VarId> vars = new ArrayList<>();
     private final Repeat repeat;
 
-    public ConcreteTimeSeries(Repeat repeat, List<String> varNames) {
+    public ConcreteTimeSeries(Repeat repeat, List<VarId> varNames) {
         this.vars.addAll(varNames);
         this.repeat = repeat;
     }

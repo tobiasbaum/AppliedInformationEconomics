@@ -18,9 +18,9 @@ package de.set.aie.base;
 public class PersistentRandomVariable extends RandomVariable {
 
     private final RandomVariable base;
-    private final String name;
+    private final VarId name;
 
-    PersistentRandomVariable(String name, final RandomVariable randomVariable) {
+    PersistentRandomVariable(VarId name, final RandomVariable randomVariable) {
         this.name = name;
         this.base = randomVariable;
     }
@@ -50,7 +50,7 @@ public class PersistentRandomVariable extends RandomVariable {
         return this.base.getType();
     }
 
-    public static PersistentRandomVariable ensurePersistent(String name2, RandomVariable toPersist) {
+    public static PersistentRandomVariable ensurePersistent(VarId name2, RandomVariable toPersist) {
         if (toPersist instanceof PersistentRandomVariable) {
             assert name2.equals(((PersistentRandomVariable) toPersist).name);
             return (PersistentRandomVariable) toPersist;

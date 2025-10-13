@@ -22,20 +22,8 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Random;
-import java.util.Set;
-import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ForkJoinPool;
@@ -45,10 +33,10 @@ import java.util.function.Function;
 public class Model {
 
     public class Instance {
-        private final ConcurrentHashMap<String, RandomVariable> vars = new ConcurrentHashMap<>();
+        private final ConcurrentHashMap<VarId, RandomVariable> vars = new ConcurrentHashMap<>();
         private final ConcurrentHashMap<String, Object> objects = new ConcurrentHashMap<>();
 
-        public RandomVariable get(final String name) {
+        public RandomVariable get(final VarId name) {
             final RandomVariable v = this.vars.get(name);
             if (v != null) {
                 return v;
@@ -58,7 +46,7 @@ public class Model {
                 throw new IllegalStateException("no definition for " + name);
             }
             final RandomVariable newV = f.apply(this);
-            return this.vars.computeIfAbsent(name, (String n) -> newV);
+            return this.vars.computeIfAbsent(name, (VarId n) -> newV);
         }
 
         public<T> T getObject(String name) {
@@ -74,11 +62,11 @@ public class Model {
             return (T) this.objects.computeIfAbsent(name, (String n) -> newT);
         }
 
-        public Map<String, double[]> createSamples(final long seed, final int sampleCount, final String... valueVariables)
+        public Map<VarId, double[]> createSamples(final long seed, final int sampleCount, final VarId... valueVariables)
             throws InterruptedException, ExecutionException {
 
-            final Map<String, double[]> samples = new LinkedHashMap<>();
-            for (final String v : valueVariables) {
+            final Map<VarId, double[]> samples = new LinkedHashMap<>();
+            for (final VarId v : valueVariables) {
                 samples.put(v, new double[sampleCount]);
             }
             final RandomSource r1 = RandomSource.wrap(new Random(seed));
@@ -92,7 +80,7 @@ public class Model {
                 final Future<?> f = ForkJoinPool.commonPool().submit(() -> {
                     for (int j = 0; j < max; j++) {
                         final SimulationRun run = new SimulationRun();
-                        for (final String v : valueVariables) {
+                        for (final VarId v : valueVariables) {
                             final RandomVariable r = this.get(v);
                             final double[] numbers = samples.get(v);
                             numbers[base + j] = r.observe(rChild, run).getNumber();
@@ -109,36 +97,36 @@ public class Model {
 
     }
 
-    private final Map<String, Function<Instance, RandomVariable>> map = new LinkedHashMap<>();
+    private final Map<VarId, Function<Instance, RandomVariable>> map = new LinkedHashMap<>();
     private final Map<String, Function<Instance, Object>> objectMap = new LinkedHashMap<>();
 
-    public void addRaw(final String name, final RandomVariable var) {
+    public void addRaw(final VarId name, final RandomVariable var) {
         this.addRaw(name, (final Instance i) -> var);
     }
 
-    public void add(final String name, final RandomVariable var) {
+    public void add(final VarId name, final RandomVariable var) {
         this.add(name, (final Instance i) -> var);
     }
 
-    public void addRaw(final String name, final Function<Instance, RandomVariable> producer) {
+    public void addRaw(final VarId name, final Function<Instance, RandomVariable> producer) {
         if (this.map.containsKey(name)) {
             throw new IllegalStateException(name + " already contained");
         }
         this.map.put(name, producer);
     }
 
-    public void add(final String name, final Function<Instance, RandomVariable> producer) {
+    public void add(final VarId name, final Function<Instance, RandomVariable> producer) {
         this.addRaw(name, producer.andThen((RandomVariable v) -> PersistentRandomVariable.ensurePersistent(name, v)));
     }
 
-    public void addRaw(final String name, final MultiVariableFactory factoryFunction) {
-        for (final Entry<String, Function<Instance, RandomVariable>> f : factoryFunction.create(name).entrySet()) {
+    public void addRaw(final VarId name, final MultiVariableFactory factoryFunction) {
+        for (final Entry<VarId, Function<Instance, RandomVariable>> f : factoryFunction.create(name).entrySet()) {
             this.addRaw(f.getKey(), f.getValue());
         }
     }
 
-    public void add(final String name, final MultiVariableFactory factoryFunction) {
-        for (final Entry<String, Function<Instance, RandomVariable>> f : factoryFunction.create(name).entrySet()) {
+    public void add(final VarId name, final MultiVariableFactory factoryFunction) {
+        for (final Entry<VarId, Function<Instance, RandomVariable>> f : factoryFunction.create(name).entrySet()) {
             this.add(f.getKey(), f.getValue());
         }
     }
@@ -154,14 +142,14 @@ public class Model {
         return new Instance();
     }
 
-    public void analyze(final long seed, final String... valueVariables)
+    public void analyze(final long seed, final VarId... valueVariables)
         throws InterruptedException, ExecutionException {
 
         final AnalysisResultHandler rh = new AnalysisResultHandler() {
             @Override
-            public void handleValueVariables(Map<String, Sample> samples, String bestChoice) {
+            public void handleValueVariables(Map<VarId, Sample> samples, VarId bestChoice) {
                 System.out.println("=== Value variables");
-                for (final Entry<String,Sample> e : samples.entrySet()) {
+                for (final Entry<VarId, Sample> e : samples.entrySet()) {
                     System.out.println("For " + e.getKey() + " ...");
                     System.out.println(e.getValue());
                 }
@@ -172,9 +160,9 @@ public class Model {
             }
 
             @Override
-            public void handleVariableOverview(Map<String, Sample> samples) {
+            public void handleVariableOverview(Map<VarId, Sample> samples) {
                 System.out.println("=== Remaining variable overview");
-                for (final Entry<String,Sample> e : samples.entrySet()) {
+                for (final Entry<VarId, Sample> e : samples.entrySet()) {
                     System.out.println("For " + e.getKey() + " ...");
                     System.out.println(e.getValue());
                 }
@@ -184,12 +172,12 @@ public class Model {
             }
 
             @Override
-            public void handleVOI(int iter, Map<String, Mean> means, Map<String, String> types) {
-                final List<String> sorted = new ArrayList<>(means.keySet());
+            public void handleVOI(int iter, Map<VarId, Mean> means, Map<VarId, String> types) {
+                final List<VarId> sorted = new ArrayList<>(means.keySet());
                 Collections.sort(sorted,
-                        (final String n1, final String n2) -> Double.compare(means.get(n2).get(), means.get(n1).get()));
+                        (final VarId n1, final VarId n2) -> Double.compare(means.get(n2).get(), means.get(n1).get()));
                 System.out.println("=== Value of information (iter=" + iter + ")");
-                for (final String name : sorted) {
+                for (final VarId name : sorted) {
                     System.out.println("value of information for " + types.get(name) + " " + name + ": " + means.get(name));
                 }
                 System.out.println(new Date());
@@ -201,31 +189,31 @@ public class Model {
 
     public static interface AnalysisResultHandler {
 
-        public abstract void handleValueVariables(Map<String, Sample> samples, String bestChoice);
+        public abstract void handleValueVariables(Map<VarId, Sample> samples, VarId bestChoice);
 
-        public abstract void handleVariableOverview(Map<String, Sample> samples);
+        public abstract void handleVariableOverview(Map<VarId, Sample> samples);
 
-        public abstract void handleVOI(int iter, Map<String, Mean> means, Map<String, String> types);
+        public abstract void handleVOI(int iter, Map<VarId, Mean> means, Map<VarId, String> types);
 
     }
 
-    public void analyze(final long seed, AnalysisResultHandler rh, final String... valueVariables)
+    public void analyze(final long seed, AnalysisResultHandler rh, final VarId... valueVariables)
         throws InterruptedException, ExecutionException {
 
         assert valueVariables.length >= 2;
         final Instance fullInstance = this.instantiate();
-        final Map<String, double[]> originalSamples = fullInstance.createSamples(seed, 10_000, valueVariables);
-        final Map<String, Sample> originalSamplesWithUnits = new LinkedHashMap<>();
-        for (final Entry<String, double[]> e : originalSamples.entrySet()) {
+        final Map<VarId, double[]> originalSamples = fullInstance.createSamples(seed, 10_000, valueVariables);
+        final Map<VarId, Sample> originalSamplesWithUnits = new LinkedHashMap<>();
+        for (final Entry<VarId, double[]> e : originalSamples.entrySet()) {
             originalSamplesWithUnits.put(e.getKey(), new Sample(e.getValue(), fullInstance.get(e.getKey()).getUnit()));
         }
 
-        final String bestChoice = this.determineBestChoice(originalSamples);
+        final VarId bestChoice = this.determineBestChoice(originalSamples);
         rh.handleValueVariables(originalSamplesWithUnits, bestChoice);
 
-        final Map<String, Sample> otherVarSamples = new TreeMap<>();
-        final Set<String> vvSet = new HashSet<>(Arrays.asList(valueVariables));
-        for (final String var : this.map.keySet()) {
+        final Map<VarId, Sample> otherVarSamples = new TreeMap<>(Comparator.comparing(VarId::toString));
+        final Set<VarId> vvSet = new HashSet<>(Arrays.asList(valueVariables));
+        for (final VarId var : this.map.keySet()) {
             if (!vvSet.contains(var)) {
                 final double[] sample = fullInstance.createSamples(seed, 10_000, var).get(var);
                 otherVarSamples.put(var, new Sample(sample, fullInstance.get(var).getUnit()));
@@ -233,26 +221,26 @@ public class Model {
         }
         rh.handleVariableOverview(otherVarSamples);
 
-        final Map<String, String> types = new LinkedHashMap<>();
-        for (final String name : this.map.keySet()) {
+        final Map<VarId, String> types = new LinkedHashMap<>();
+        for (final VarId name : this.map.keySet()) {
             types.put(name, fullInstance.get(name).getType());
         }
 
         final RandomSource sampleRandom = RandomSource.wrap(new Random(seed));
-        final Map<String, Mean> meanLosses = new LinkedHashMap<>();
-        for (final String name : this.map.keySet()) {
+        final Map<VarId, Mean> meanLosses = new LinkedHashMap<>();
+        for (final VarId name : this.map.keySet()) {
             meanLosses.put(name, Mean.undefined());
         }
         long lastPrintTime = 0;
         for (int j = 0; j < 10_000; j++) {
-            for (final String name : this.map.keySet()) {
+            for (final VarId name : this.map.keySet()) {
                 for (int i = 0; i < 10; i++) {
                     final long iterSeed = seed + i + 100 * j;
                     final Instance reducedInstance = this.createReducedInstance(name, sampleRandom);
-                    final Map<String, double[]> reducedSamples = reducedInstance.createSamples(iterSeed, 2_000, valueVariables);
-                    final String bestChoiceWithInformation = this.determineBestChoice(reducedSamples);
+                    final Map<VarId, double[]> reducedSamples = reducedInstance.createSamples(iterSeed, 2_000, valueVariables);
+                    final VarId bestChoiceWithInformation = this.determineBestChoice(reducedSamples);
                     final double[] loss = this.minus(reducedSamples.get(bestChoiceWithInformation), reducedSamples.get(bestChoice));
-                    meanLosses.compute(name, (final String k, final Mean v) -> v.add(Mean.of(loss)));
+                    meanLosses.compute(name, (final VarId k, final Mean v) -> v.add(Mean.of(loss)));
                 }
             }
             final long curTime = System.currentTimeMillis();
@@ -273,10 +261,10 @@ public class Model {
         return ret;
     }
 
-    private String determineBestChoice(final Map<String, double[]> samples) {
-        String bestName = null;
+    private VarId determineBestChoice(final Map<VarId, double[]> samples) {
+        VarId bestName = null;
         double best = Double.NEGATIVE_INFINITY;
-        for (final Entry<String, double[]> e : samples.entrySet()) {
+        for (final Entry<VarId, double[]> e : samples.entrySet()) {
             final double cur = Mean.of(e.getValue()).get();
             if (cur > best) {
                 bestName = e.getKey();
@@ -286,21 +274,21 @@ public class Model {
         return bestName;
     }
 
-    private Instance createReducedInstance(final String toReduce, final RandomSource sampleRandom) {
+    private Instance createReducedInstance(final VarId toReduce, final RandomSource sampleRandom) {
         final Quantity sample = this.sampleValue(toReduce, sampleRandom);
         final Instance reducedInstance = this.instantiate();
         reducedInstance.vars.put(toReduce, Distributions.fixed(sample));
         return reducedInstance;
     }
 
-    private Quantity sampleValue(final String toReduce, final RandomSource sampleRandom) {
+    private Quantity sampleValue(final VarId toReduce, final RandomSource sampleRandom) {
         return this.instantiate().get(toReduce).observe(sampleRandom, new SimulationRun());
     }
 
-    public List<String> getAllPersistentVariables() throws AssertionError {
-        final List<String> allPersistentVariables = new ArrayList<>();
+    public List<VarId> getAllPersistentVariables() throws AssertionError {
+        final List<VarId> allPersistentVariables = new ArrayList<>();
         final Instance i = this.instantiate();
-        for (final String name : this.map.keySet()) {
+        for (final VarId name : this.map.keySet()) {
             if (i.get(name) instanceof PersistentRandomVariable) {
                 allPersistentVariables.add(name);
             }
@@ -309,39 +297,39 @@ public class Model {
     }
 
     public void printDistributions(final File file, final long seed) throws IOException {
-        final List<String> cols = this.getAllPersistentVariables();
+        final List<VarId> cols = this.getAllPersistentVariables();
         cols.addAll(this.getAdditionalPersistedValues(seed, cols));
 
         this.printDistributions(file, seed, cols);
     }
 
-    private Collection<? extends String> getAdditionalPersistedValues(long seed, List<String> cols) {
+    private Collection<? extends VarId> getAdditionalPersistedValues(long seed, List<VarId> cols) {
         final Instance inst = this.instantiate();
         final SimulationRun run = new SimulationRun();
         final RandomSource r = RandomSource.wrap(new Random(seed));
 
-        for (final String col : cols) {
+        for (final VarId col : cols) {
             inst.get(col).observe(r, run);
         }
 
-        final List<String> ret = new ArrayList<>(run.getPersistentValueNames());
+        final List<VarId> ret = new ArrayList<>(run.getPersistentValueNames());
         ret.removeAll(cols);
-        Collections.sort(ret);
+        Collections.sort(ret, Comparator.comparing(VarId::toString));
         return ret;
     }
 
-    public void printDistributions(final File file, final long seed, final Collection<String> columns) throws IOException {
-        this.printDistributions(file, seed, columns.toArray(new String[columns.size()]));
+    public void printDistributions(final File file, final long seed, final Collection<VarId> columns) throws IOException {
+        this.printDistributions(file, seed, columns.toArray(new VarId[columns.size()]));
     }
 
-    public void printDistributions(final File file, final long seed, final String... columns) throws IOException {
+    public void printDistributions(final File file, final long seed, final VarId... columns) throws IOException {
         final RandomSource r = RandomSource.wrap(new Random(seed));
         try (FileOutputStream out = new FileOutputStream(file);
                 BufferedWriter w = new BufferedWriter(new OutputStreamWriter(out, "UTF-8"))) {
             final Instance inst = this.instantiate();
             final List<RandomVariable> v = new ArrayList<>();
             w.write("i");
-            for (final String colName : columns) {
+            for (final VarId colName : columns) {
                 if (this.map.containsKey(colName)) {
                     final RandomVariable var = inst.get(colName);
                     v.add(var);
@@ -359,7 +347,7 @@ public class Model {
                 for (final RandomVariable var : v) {
                     var.observe(r, run);
                 }
-                for (final String colName : columns) {
+                for (final VarId colName : columns) {
                     final Quantity q = run.getPersistentValue(colName);
                     w.write(';');
                     w.write(df.format(q.getNumber()));
