@@ -111,7 +111,15 @@ public class Distributions {
         return new Between(lower, upper);
     }
 
+    public static Between between(final int lower, final int upper) {
+        return new Between(lower, upper);
+    }
+
     public static SingleMode singleMode(final double lower, final double mode, final double upper) {
+        return new SingleMode(lower, mode, upper);
+    }
+
+    public static SingleMode singleMode(final int lower, final int mode, final int upper) {
         return new SingleMode(lower, mode, upper);
     }
 
@@ -156,6 +164,10 @@ public class Distributions {
         return fixed(Quantity.of(value, unit));
     }
 
+    public static FixedRandomVariable fixed(final int value, Unit unit) {
+        return fixed(Quantity.of(value, unit));
+    }
+
     public static RandomVariable empirical(final Unit unit, final double... values) {
         return new EmpiricalRandomVariable(unit, values);
     }
@@ -170,6 +182,10 @@ public class Distributions {
 
     public static RandomVariable block(final double lower05, final double upper95, final Unit unit) {
         return new BlockDistributedRandomVariable(lower05, upper95, unit);
+    }
+
+    public static RandomVariable block(final Between between, final Unit unit) {
+        return new BlockDistributedRandomVariable(between.lower, between.upper, unit);
     }
 
     public static RandomVariable shiftedExp(final double lower, final double upper, final Unit unit) {

@@ -5,7 +5,7 @@ package de.set.aie.base;
  * Muss equals, hashcode + toString implementieren, und zwar so, dass zwei gleiche IDs auch die gleiche
  * String-Darstellung haben.
  */
-public interface VarId {
+public interface VarId extends SyntacticExpression {
 
     public static VarId of(String id) {
         return new StringId(id);
@@ -17,6 +17,10 @@ public interface VarId {
      */
     public default VarId subvar(String subId) {
         return of(this.toString() + "_" + subId);
+    }
+
+    public default RandomVariable instantiate(Model.Instance inst) {
+        return inst.get(this);
     }
 
 }

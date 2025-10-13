@@ -79,6 +79,18 @@ public abstract class RandomVariable {
         return new RangeBoundRandomVariable(this, lowerBound, upperBound);
     }
 
+    public RandomVariable bound(final int lowerBound, final int upperBound) {
+        return new RangeBoundRandomVariable(this, lowerBound, upperBound);
+    }
+
+    public RandomVariable lowerBound(final double lowerBound) {
+        return bound(lowerBound, Double.POSITIVE_INFINITY);
+    }
+
+    public RandomVariable lowerBound(final int lowerBound) {
+        return bound((double) lowerBound, Double.POSITIVE_INFINITY);
+    }
+
     public RandomVariable nonNegative() {
         return this.bound(0, Double.POSITIVE_INFINITY);
     }
