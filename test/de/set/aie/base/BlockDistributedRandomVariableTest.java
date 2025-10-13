@@ -27,7 +27,7 @@ public class BlockDistributedRandomVariableTest {
     @Test
     public void testDistribution1() {
         final BlockDistributedRandomVariable v = new BlockDistributedRandomVariable(3, 8, Unit.of("h"));
-        assertEquals("D", v.getType());
+        assertEquals(VarKind.D, v.getType());
         final double[] samples = sample(v, Unit.of("h")); //$NON-NLS-1$
         checkCountBetween(samples, Double.NEGATIVE_INFINITY, 3.0, 5000, 200);
         checkCountBetween(samples, 3.0, 8.0, 90000, 400);

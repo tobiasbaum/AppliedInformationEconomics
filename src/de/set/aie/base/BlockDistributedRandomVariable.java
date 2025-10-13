@@ -46,8 +46,8 @@ public class BlockDistributedRandomVariable extends RandomVariable {
     }
 
     @Override
-    public String getType() {
-        return "D";
+    public VarKind getType() {
+        return VarKind.D;
     }
 
 }

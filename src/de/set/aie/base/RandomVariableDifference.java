@@ -36,8 +36,8 @@ public class RandomVariableDifference extends RandomVariable {
     }
 
     @Override
-    public String getType() {
-        return "C"; //$NON-NLS-1$
+    public VarKind getType() {
+        return VarKind.C;
     }
 
 }

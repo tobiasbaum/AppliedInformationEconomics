@@ -85,7 +85,7 @@ public abstract class RandomVariable {
 
     public abstract Unit getUnit();
 
-    public abstract String getType();
+    public abstract VarKind getType();
 
     public Sample sample(final long seed, final int sampleCount) {
         final double[] numbers = new double[sampleCount];

@@ -37,8 +37,8 @@ public class UncertainDistributionVariable extends RandomVariable {
     }
 
     @Override
-    public String getType() {
-        return "U";
+    public VarKind getType() {
+        return VarKind.U;
     }
 
 }

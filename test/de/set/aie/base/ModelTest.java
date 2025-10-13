@@ -42,7 +42,7 @@ public class ModelTest {
         }
 
         @Override
-        public void handleVOI(int iter, Map<VarId, Mean> means, Map<VarId, String> types) {
+        public void handleVOI(int iter, Map<VarId, Mean> means, Map<VarId, VarKind> types) {
             for (final Mean m : means.values()) {
                 assertThat(m.get(), greaterThanOrEqualTo(0.0));
             }

@@ -48,8 +48,8 @@ public class ConditionalDistribution extends RandomVariable {
     }
 
     @Override
-    public String getType() {
-        return "C";
+    public VarKind getType() {
+        return VarKind.C;
     }
 
 }

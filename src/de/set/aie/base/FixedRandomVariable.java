@@ -34,8 +34,8 @@ public class FixedRandomVariable extends RandomVariable {
     }
 
     @Override
-    public String getType() {
-        return "F"; //$NON-NLS-1$
+    public VarKind getType() {
+        return VarKind.F;
     }
 
 }

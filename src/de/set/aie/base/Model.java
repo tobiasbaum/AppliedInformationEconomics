@@ -172,7 +172,7 @@ public class Model {
             }
 
             @Override
-            public void handleVOI(int iter, Map<VarId, Mean> means, Map<VarId, String> types) {
+            public void handleVOI(int iter, Map<VarId, Mean> means, Map<VarId, VarKind> types) {
                 final List<VarId> sorted = new ArrayList<>(means.keySet());
                 Collections.sort(sorted,
                         (final VarId n1, final VarId n2) -> Double.compare(means.get(n2).get(), means.get(n1).get()));
@@ -193,7 +193,7 @@ public class Model {
 
         public abstract void handleVariableOverview(Map<VarId, Sample> samples);
 
-        public abstract void handleVOI(int iter, Map<VarId, Mean> means, Map<VarId, String> types);
+        public abstract void handleVOI(int iter, Map<VarId, Mean> means, Map<VarId, VarKind> types);
 
     }
 
@@ -221,7 +221,7 @@ public class Model {
         }
         rh.handleVariableOverview(otherVarSamples);
 
-        final Map<VarId, String> types = new LinkedHashMap<>();
+        final Map<VarId, VarKind> types = new LinkedHashMap<>();
         for (final VarId name : this.map.keySet()) {
             types.put(name, fullInstance.get(name).getType());
         }

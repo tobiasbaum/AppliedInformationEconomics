@@ -26,7 +26,7 @@ public class EmpiricalRandomVariableTest {
     @Test
     public void testDistribution1() {
         final EmpiricalRandomVariable v = new EmpiricalRandomVariable(Unit.of("EUR"), 1.0, 10.0, 15.0, 23.0);
-        assertEquals("D", v.getType());
+        assertEquals(VarKind.D, v.getType());
         final double[] samples = sample(v, Unit.of("EUR")); //$NON-NLS-1$
         checkCountBetween(samples, 0.5, 1.5, 25000, 400);
         checkCountBetween(samples, 9.5, 10.5, 25000, 400);

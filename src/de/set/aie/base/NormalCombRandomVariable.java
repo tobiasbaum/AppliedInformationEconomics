@@ -61,8 +61,8 @@ public class NormalCombRandomVariable extends RandomVariable {
     }
 
     @Override
-    public String getType() {
-        return "D"; //$NON-NLS-1$
+    public VarKind getType() {
+        return VarKind.D;
     }
 
 }

@@ -28,7 +28,7 @@ public class BinomRandomVariableTest {
         final BinomRandomVariable v = new BinomRandomVariable(
                 Distributions.fixed(Quantity.of(99, "h")),
                 Distributions.fixed(Quantity.of(0.5, Unit.scalar())));
-        assertEquals("C", v.getType());
+        assertEquals(VarKind.C, v.getType());
         final double[] samples = sample(v, Unit.of("h")); //$NON-NLS-1$
         checkCountBetween(samples, Double.NEGATIVE_INFINITY, 0.0, 0, 0);
         checkCountBetween(samples, 0.0, 49.5, 50000, 500);
@@ -40,7 +40,7 @@ public class BinomRandomVariableTest {
         final BinomRandomVariable v = new BinomRandomVariable(
                 Distributions.fixed(Quantity.of(99, "h")),
                 Distributions.fixed(Quantity.of(0.0, Unit.scalar())));
-        assertEquals("C", v.getType());
+        assertEquals(VarKind.C, v.getType());
         final double[] samples = sample(v, Unit.of("h")); //$NON-NLS-1$
         checkCountBetween(samples, Double.NEGATIVE_INFINITY, 0.0, 0, 0);
         checkCountBetween(samples, 0.0, 0.5, 100000, 0);
@@ -52,7 +52,7 @@ public class BinomRandomVariableTest {
         final BinomRandomVariable v = new BinomRandomVariable(
                 Distributions.fixed(Quantity.of(99, "h")),
                 Distributions.fixed(Quantity.of(1.0, Unit.scalar())));
-        assertEquals("C", v.getType());
+        assertEquals(VarKind.C, v.getType());
         final double[] samples = sample(v, Unit.of("h")); //$NON-NLS-1$
         checkCountBetween(samples, Double.NEGATIVE_INFINITY, 98.5, 0, 0);
         checkCountBetween(samples, 99.0, 99.5, 100000, 0);

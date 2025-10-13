@@ -46,7 +46,7 @@ public class PersistentRandomVariable extends RandomVariable {
     }
 
     @Override
-    public String getType() {
+    public VarKind getType() {
         return this.base.getType();
     }
 

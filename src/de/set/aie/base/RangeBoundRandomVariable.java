@@ -56,7 +56,7 @@ public class RangeBoundRandomVariable extends RandomVariable {
     }
 
     @Override
-    public String getType() {
+    public VarKind getType() {
         return this.base.getType();
     }
 
