@@ -32,14 +32,14 @@ class UnknownDistFactory implements MultiVariableFactory {
     private final double absoluteMin;
     private final List<Between> estimatedRanges;
     private final double absoluteMax;
-    private final Unit unit;
+    private final QUnit unit;
 
     public UnknownDistFactory(
             final Set<StdDist> possibleDistributions,
             final double absoluteMin,
             final List<Between> estimatedRanges,
             final double absoluteMax,
-            final Unit unit) {
+            final QUnit unit) {
 
         assert possibleDistributions.size() > 0;
         assert estimatedRanges.size() > 0;
@@ -67,7 +67,7 @@ class UnknownDistFactory implements MultiVariableFactory {
         final VarId distName = baseName.subvar("dist"); //$NON-NLS-1$
         ret.put(distName,
                 (final Instance m) -> PersistentRandomVariable.ensurePersistent(distName,
-                        Distributions.empirical(Unit.scalar(), indices)));
+                        Distributions.empirical(QUnit.scalar(), indices)));
         ret.put(baseName, (final Instance m) ->
             new UncertainDistributionVariable(
                     m.get(distName), //$NON-NLS-1$

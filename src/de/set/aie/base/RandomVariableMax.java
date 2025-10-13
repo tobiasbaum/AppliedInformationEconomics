@@ -31,7 +31,7 @@ public class RandomVariableMax extends RandomVariable {
     }
 
     @Override
-    public Unit getUnit() {
+    public QUnit getUnit() {
         return this.r1.getUnit();
     }
 

@@ -25,12 +25,12 @@ public class TestModel {
     private static class EqRv extends RandomVariable {
         @Override
         public Quantity observe(final RandomSource r, final SimulationRun run) {
-            return Quantity.of(r.nextDouble(), Unit.scalar());
+            return Quantity.of(r.nextDouble(), QUnit.scalar());
         }
 
         @Override
-        public Unit getUnit() {
-            return Unit.scalar();
+        public QUnit getUnit() {
+            return QUnit.scalar();
         }
 
         @Override
@@ -41,7 +41,7 @@ public class TestModel {
     }
 
     public static void main(final String[] args) throws InterruptedException, ExecutionException {
-        final Unit EUR = Unit.of("EUR");
+        final QUnit EUR = QUnit.of("EUR");
         final Model m = new Model();
         m.addRaw(VarId.of("p"), new EqRv());
         m.addRaw(VarId.of("play"), (final Instance i) -> Distributions.conditional(i.get(VarId.of("p")),

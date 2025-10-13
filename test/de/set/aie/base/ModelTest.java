@@ -59,10 +59,10 @@ public class ModelTest {
     @Test
     public void test1() throws Exception {
         final Model m = new Model();
-        m.addRaw(VarId.of("dir"), Distributions.empirical(Unit.scalar(), -1.0, 1.0));
-        m.addRaw(VarId.of("val"), Distributions.fixed(Quantity.of(10.0, Unit.of("EUR"))));
+        m.addRaw(VarId.of("dir"), Distributions.empirical(QUnit.scalar(), -1.0, 1.0));
+        m.addRaw(VarId.of("val"), Distributions.fixed(Quantity.of(10.0, QUnit.of("EUR"))));
         m.addRaw(VarId.of("combined"), (final Instance i) -> i.get(VarId.of("dir")).times(i.get(VarId.of("val"))));
-        m.addRaw(VarId.of("zero"), Distributions.fixed(Quantity.of(0, Unit.of("EUR"))));
+        m.addRaw(VarId.of("zero"), Distributions.fixed(Quantity.of(0, QUnit.of("EUR"))));
 
         final VoiResultChecker ch = new VoiResultChecker();
         m.analyze(132, ch, VarId.of("combined"), VarId.of("zero"));
@@ -73,10 +73,10 @@ public class ModelTest {
     @Test
     public void test2() throws Exception {
         final Model m = new Model();
-        m.addRaw(VarId.of("dir"), Distributions.empirical(Unit.scalar(), -1.0, 1.0));
-        m.addRaw(VarId.of("val"), Distributions.shiftedExp(1.0, 10.0, Unit.of("EUR")));
+        m.addRaw(VarId.of("dir"), Distributions.empirical(QUnit.scalar(), -1.0, 1.0));
+        m.addRaw(VarId.of("val"), Distributions.shiftedExp(1.0, 10.0, QUnit.of("EUR")));
         m.addRaw(VarId.of("combined"), (final Instance i) -> i.get(VarId.of("dir")).times(i.get(VarId.of("val"))));
-        m.addRaw(VarId.of("zero"), Distributions.fixed(Quantity.of(0, Unit.of("EUR"))));
+        m.addRaw(VarId.of("zero"), Distributions.fixed(Quantity.of(0, QUnit.of("EUR"))));
 
         final VoiResultChecker ch = new VoiResultChecker();
         m.analyze(132, ch, VarId.of("combined"), VarId.of("zero"));

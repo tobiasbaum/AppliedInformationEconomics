@@ -17,8 +17,8 @@ package de.set.aie.base;
 
 public class RandomVariableLessThan extends RandomVariable {
 
-    private static final Quantity ZERO = Quantity.of(0, Unit.scalar());
-    private static final Quantity ONE = Quantity.of(1, Unit.scalar());
+    private static final Quantity ZERO = Quantity.of(0, QUnit.scalar());
+    private static final Quantity ONE = Quantity.of(1, QUnit.scalar());
 
     private final RandomVariable r1;
     private final RandomVariable r2;
@@ -34,8 +34,8 @@ public class RandomVariableLessThan extends RandomVariable {
     }
 
     @Override
-    public Unit getUnit() {
-        return Unit.scalar();
+    public QUnit getUnit() {
+        return QUnit.scalar();
     }
 
     @Override

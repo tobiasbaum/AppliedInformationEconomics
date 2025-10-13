@@ -25,9 +25,9 @@ public class ShiftedExponentialRandomVariableTest {
 
     @Test
     public void testDistribution1() {
-        final ShiftedExponentialRandomVariable v = new ShiftedExponentialRandomVariable(3, 8, false, Unit.of("h"));
+        final ShiftedExponentialRandomVariable v = new ShiftedExponentialRandomVariable(3, 8, false, QUnit.of("h"));
         assertEquals(VarKind.D, v.getType());
-        final double[] samples = sample(v, Unit.of("h")); //$NON-NLS-1$
+        final double[] samples = sample(v, QUnit.of("h")); //$NON-NLS-1$
         checkCountBetween(samples, Double.NEGATIVE_INFINITY, 3.0, 0, 0);
         checkCountBetween(samples, 3.0, 8.0, 90000, 400);
         checkCountBetween(samples, 3.0, 4.5051, 50000, 500);
@@ -36,9 +36,9 @@ public class ShiftedExponentialRandomVariableTest {
 
     @Test
     public void testDistribution2() {
-        final ShiftedExponentialRandomVariable v = new ShiftedExponentialRandomVariable(4, 10, true, Unit.of("EUR"));
+        final ShiftedExponentialRandomVariable v = new ShiftedExponentialRandomVariable(4, 10, true, QUnit.of("EUR"));
         assertEquals(VarKind.D, v.getType());
-        final double[] samples = sample(v, Unit.of("EUR")); //$NON-NLS-1$
+        final double[] samples = sample(v, QUnit.of("EUR")); //$NON-NLS-1$
         checkCountBetween(samples, Double.NEGATIVE_INFINITY, 4.0, 10000, 200);
         checkCountBetween(samples, 4.0, 10.0, 90000, 400);
         checkCountBetween(samples, 8.1938, 10.0, 50000, 500);

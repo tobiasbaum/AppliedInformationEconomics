@@ -56,7 +56,7 @@ public abstract class RandomVariable {
     }
 
     public RandomVariable times(final double factor) {
-        return this.times(Quantity.of(factor, Unit.scalar()));
+        return this.times(Quantity.of(factor, QUnit.scalar()));
     }
 
     public RandomVariable sumOfN(final RandomVariable count) {
@@ -64,7 +64,7 @@ public abstract class RandomVariable {
     }
 
     public RandomVariable sumOfN(final int count) {
-        return new RandomVariableSumOfN(this, new FixedRandomVariable(Quantity.of(count, Unit.scalar())));
+        return new RandomVariableSumOfN(this, new FixedRandomVariable(Quantity.of(count, QUnit.scalar())));
     }
 
     public RandomVariable div(final RandomVariable other) {
@@ -95,7 +95,7 @@ public abstract class RandomVariable {
         return this.bound(0, Double.POSITIVE_INFINITY);
     }
 
-    public abstract Unit getUnit();
+    public abstract QUnit getUnit();
 
     public abstract VarKind getType();
 

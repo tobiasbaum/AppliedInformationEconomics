@@ -29,7 +29,7 @@ public class FixedRandomVariable extends RandomVariable {
     }
 
     @Override
-    public Unit getUnit() {
+    public QUnit getUnit() {
         return this.q.getUnit();
     }
 

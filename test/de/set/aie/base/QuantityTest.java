@@ -49,8 +49,8 @@ public class QuantityTest {
 
     @Test
     public void testTimes1() {
-        assertEquals(Quantity.of(2, "h"), Quantity.of(1, "h").times(Quantity.of(2, Unit.scalar())));
-        assertEquals(Quantity.of(12, Unit.of("EUR").times(Unit.of("EUR"))), Quantity.of(4, "EUR").times(Quantity.of(3, "EUR")));
+        assertEquals(Quantity.of(2, "h"), Quantity.of(1, "h").times(Quantity.of(2, QUnit.scalar())));
+        assertEquals(Quantity.of(12, QUnit.of("EUR").times(QUnit.of("EUR"))), Quantity.of(4, "EUR").times(Quantity.of(3, "EUR")));
     }
 
     @Test
@@ -74,15 +74,15 @@ public class QuantityTest {
 
     @Test
     public void testToString() {
-        assertEquals("2,00", Quantity.of(2, Unit.scalar()).toString());
+        assertEquals("2,00", Quantity.of(2, QUnit.scalar()).toString());
         assertEquals("3,10EUR", Quantity.of(3.1, "EUR").toString());
         assertEquals("1.234.567,10EUR", Quantity.of(1234567.1, "EUR").toString());
     }
 
     @Test
     public void testGetter() {
-        assertEquals(2.0, Quantity.of(2, Unit.scalar()).getNumber(), 0.000000001);
-        assertEquals(Unit.scalar(), Quantity.of(2, Unit.scalar()).getUnit());
+        assertEquals(2.0, Quantity.of(2, QUnit.scalar()).getNumber(), 0.000000001);
+        assertEquals(QUnit.scalar(), Quantity.of(2, QUnit.scalar()).getUnit());
     }
 
 }

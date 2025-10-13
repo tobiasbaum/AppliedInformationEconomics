@@ -22,12 +22,12 @@ public class ConditionalDistribution extends RandomVariable {
     private final RandomVariable v1Prop;
 
     public ConditionalDistribution(final double v1Prop, final RandomVariable v1, final RandomVariable v2) {
-        this(new FixedRandomVariable(Quantity.of(v1Prop, Unit.scalar())), v1, v2);
+        this(new FixedRandomVariable(Quantity.of(v1Prop, QUnit.scalar())), v1, v2);
     }
 
     public ConditionalDistribution(final RandomVariable v1Prop, final RandomVariable v1, final RandomVariable v2) {
         assert v1.getUnit().equals(v2.getUnit());
-        assert v1Prop.getUnit().equals(Unit.scalar());
+        assert v1Prop.getUnit().equals(QUnit.scalar());
         this.v1 = v1;
         this.v2 = v2;
         this.v1Prop = v1Prop;
@@ -43,7 +43,7 @@ public class ConditionalDistribution extends RandomVariable {
     }
 
     @Override
-    public Unit getUnit() {
+    public QUnit getUnit() {
         return this.v1.getUnit();
     }
 

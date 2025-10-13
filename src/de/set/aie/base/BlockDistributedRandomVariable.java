@@ -19,9 +19,9 @@ public class BlockDistributedRandomVariable extends RandomVariable {
 
     private final double lower;
     private final double upper;
-    private final Unit unit;
+    private final QUnit unit;
 
-    public BlockDistributedRandomVariable(final double lower, final double upper, final Unit unit) {
+    public BlockDistributedRandomVariable(final double lower, final double upper, final QUnit unit) {
         this.lower = lower;
         this.upper = upper;
         this.unit = unit;
@@ -41,7 +41,7 @@ public class BlockDistributedRandomVariable extends RandomVariable {
     }
 
     @Override
-    public Unit getUnit() {
+    public QUnit getUnit() {
         return this.unit;
     }
 

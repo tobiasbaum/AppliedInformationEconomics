@@ -31,7 +31,7 @@ public class RandomVariableSum extends RandomVariable {
     }
 
     @Override
-    public Unit getUnit() {
+    public QUnit getUnit() {
         return this.r1.getUnit();
     }
 

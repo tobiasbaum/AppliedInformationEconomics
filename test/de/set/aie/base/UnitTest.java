@@ -24,58 +24,58 @@ public class UnitTest {
 
     @Test
     public void testToString1() {
-        final Unit u = Unit.of("EUR");
+        final QUnit u = QUnit.of("EUR");
         assertEquals("EUR", u.toString());
     }
 
     @Test
     public void testToString2() {
-        final Unit u1 = Unit.of("EUR");
-        final Unit u2 = Unit.of("cm");
+        final QUnit u1 = QUnit.of("EUR");
+        final QUnit u2 = QUnit.of("cm");
         assertEquals("EUR*cm", u1.times(u2).toString());
     }
 
     @Test
     public void testToString3() {
-        final Unit u = Unit.of("EUR");
+        final QUnit u = QUnit.of("EUR");
         assertEquals("EUR*EUR", u.times(u).toString());
     }
 
     @Test
     public void testToString4() {
-        final Unit u = Unit.of("EUR");
+        final QUnit u = QUnit.of("EUR");
         assertEquals("", u.div(u).toString());
     }
 
     @Test
     public void testToString5() {
-        final Unit u1 = Unit.of("EUR");
-        final Unit u2 = Unit.of("h");
+        final QUnit u1 = QUnit.of("EUR");
+        final QUnit u2 = QUnit.of("h");
         assertEquals("EUR/h", u1.div(u2).toString());
     }
 
     @Test
     public void testToString6() {
-        final Unit u = Unit.of("EUR");
+        final QUnit u = QUnit.of("EUR");
         assertEquals("1/EUR", u.div(u).div(u).toString());
     }
 
     @Test
     public void testToString7() {
-        final Unit u = Unit.of("EUR");
+        final QUnit u = QUnit.of("EUR");
         assertEquals("EUR", u.times(u).div(u).toString());
     }
 
     @Test
     public void testToString8() {
-        final Unit u = Unit.of("EUR");
+        final QUnit u = QUnit.of("EUR");
         assertEquals("EUR", u.div(u).times(u).toString());
     }
 
     @Test
     public void testEquals() {
-        final Unit u1 = Unit.of("EUR");
-        final Unit u2 = Unit.of("EUR");
+        final QUnit u1 = QUnit.of("EUR");
+        final QUnit u2 = QUnit.of("EUR");
         assertEquals(u1, u2);
         assertNotEquals(u1, u2.times(u1));
         assertNotEquals(u1, u2.div(u1));

@@ -70,7 +70,7 @@ public abstract class TimeSeries {
      */
     public TimeSeries times(double factor) {
         return new TransformedTimeSeriesConst(
-                this, Distributions.fixed(factor, Unit.scalar()), RandomVariable::times);
+                this, Distributions.fixed(factor, QUnit.scalar()), RandomVariable::times);
     }
 
     /**

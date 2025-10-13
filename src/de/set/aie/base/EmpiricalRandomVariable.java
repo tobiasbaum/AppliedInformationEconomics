@@ -18,9 +18,9 @@ package de.set.aie.base;
 public class EmpiricalRandomVariable extends RandomVariable {
 
     private final double[] values;
-    private final Unit unit;
+    private final QUnit unit;
 
-    public EmpiricalRandomVariable(final Unit unit, final double... values) {
+    public EmpiricalRandomVariable(final QUnit unit, final double... values) {
         assert values.length > 0;
         this.values = values;
         this.unit = unit;
@@ -33,7 +33,7 @@ public class EmpiricalRandomVariable extends RandomVariable {
     }
 
     @Override
-    public Unit getUnit() {
+    public QUnit getUnit() {
         return this.unit;
     }
 

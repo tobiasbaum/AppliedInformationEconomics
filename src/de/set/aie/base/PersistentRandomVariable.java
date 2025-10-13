@@ -41,7 +41,7 @@ public class PersistentRandomVariable extends RandomVariable {
     }
 
     @Override
-    public Unit getUnit() {
+    public QUnit getUnit() {
         return this.base.getUnit();
     }
 

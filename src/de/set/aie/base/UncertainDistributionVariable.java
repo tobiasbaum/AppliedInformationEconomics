@@ -32,7 +32,7 @@ public class UncertainDistributionVariable extends RandomVariable {
     }
 
     @Override
-    public Unit getUnit() {
+    public QUnit getUnit() {
         return this.dists[0].getUnit();
     }
 

@@ -20,18 +20,18 @@ import java.util.Locale;
 public class Quantity implements Comparable<Quantity> {
 
     private final double value;
-    private final Unit unit;
+    private final QUnit unit;
 
-    private Quantity(final double v, final Unit u) {
+    private Quantity(final double v, final QUnit u) {
         this.value = v;
         this.unit = u;
     }
 
     public static Quantity of(final double value, final String unit) {
-        return of(value, Unit.of(unit));
+        return of(value, QUnit.of(unit));
     }
 
-    public static Quantity of(final double value, final Unit unit) {
+    public static Quantity of(final double value, final QUnit unit) {
         return new Quantity(value, unit);
     }
 
@@ -95,7 +95,7 @@ public class Quantity implements Comparable<Quantity> {
         return this.value;
     }
 
-    public Unit getUnit() {
+    public QUnit getUnit() {
         return this.unit;
     }
 

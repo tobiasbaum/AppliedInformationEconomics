@@ -7,8 +7,8 @@ import java.util.function.Function;
  */
 public class ConditionalTimeSeries extends TimeSeries {
 
-    private static final RandomVariable TRUE = Distributions.fixed(1, Unit.scalar());
-    private static final RandomVariable FALSE = Distributions.fixed(0, Unit.scalar());
+    private static final RandomVariable TRUE = Distributions.fixed(1, QUnit.scalar());
+    private static final RandomVariable FALSE = Distributions.fixed(0, QUnit.scalar());
 
     private final VarId decision;
     private final TimeSeries v1;

@@ -20,9 +20,9 @@ import java.util.Arrays;
 public class Sample {
 
     private final double[] numbers;
-    private final Unit unit;
+    private final QUnit unit;
 
-    Sample(final double[] numbers, final Unit unit) {
+    Sample(final double[] numbers, final QUnit unit) {
         this.numbers = numbers;
         this.unit = unit;
         Arrays.sort(numbers);

@@ -29,7 +29,7 @@ public class ConditionalValue extends RandomVariable {
     }
 
     public ConditionalValue(final double v1Prop, final Quantity v1) {
-        this(v1Prop, v1, v1.times(Quantity.of(0, Unit.scalar())));
+        this(v1Prop, v1, v1.times(Quantity.of(0, QUnit.scalar())));
     }
 
     @Override
@@ -42,7 +42,7 @@ public class ConditionalValue extends RandomVariable {
     }
 
     @Override
-    public Unit getUnit() {
+    public QUnit getUnit() {
         return this.v1.getUnit();
     }
 

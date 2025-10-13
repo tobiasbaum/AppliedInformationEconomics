@@ -24,7 +24,7 @@ public class ShrinkAfterTimeSeries extends TimeSeries {
                 return base.getFor(time).apply(inst);
             } else {
                 return Distributions.conditional(
-                        inst.get(yearsUntil).lessThan(Distributions.fixed(time, Unit.scalar())),
+                        inst.get(yearsUntil).lessThan(Distributions.fixed(time, QUnit.scalar())),
                         base.getFor(time).apply(inst),
                         this.getFor(time - 1).apply(inst).times(inst.get(shrinkRate))
                 );

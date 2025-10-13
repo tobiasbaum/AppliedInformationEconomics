@@ -32,9 +32,9 @@ public class BetaBinomialRandomVariable extends RandomVariable {
     private final double a;
     private final double b;
     private final double shift;
-    private final Unit unit;
+    private final QUnit unit;
 
-    public BetaBinomialRandomVariable(int n, double a, double b, double shift, Unit unit) {
+    public BetaBinomialRandomVariable(int n, double a, double b, double shift, QUnit unit) {
         this.n = n;
         this.a = a;
         this.b = b;
@@ -100,7 +100,7 @@ public class BetaBinomialRandomVariable extends RandomVariable {
     }
 
     @Override
-    public Unit getUnit() {
+    public QUnit getUnit() {
         return this.unit;
     }
 

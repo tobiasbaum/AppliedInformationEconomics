@@ -24,9 +24,9 @@ public class NormalCombRandomVariable extends RandomVariable {
     private final double mode;
     private final double sdLeft;
     private final double sdRight;
-    private final Unit unit;
+    private final QUnit unit;
 
-    public NormalCombRandomVariable(double lower, double mode, double upper, Unit unit) {
+    public NormalCombRandomVariable(double lower, double mode, double upper, QUnit unit) {
         assert lower <= mode;
         assert mode <= upper;
         this.mode = mode;
@@ -56,7 +56,7 @@ public class NormalCombRandomVariable extends RandomVariable {
     }
 
     @Override
-    public Unit getUnit() {
+    public QUnit getUnit() {
         return this.unit;
     }
 

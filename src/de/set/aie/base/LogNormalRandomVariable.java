@@ -19,9 +19,9 @@ public class LogNormalRandomVariable extends RandomVariable {
 
     private final double normalMean;
     private final double normalSd;
-    private final Unit unit;
+    private final QUnit unit;
 
-    public LogNormalRandomVariable(final double normalMean, final double normalSd, final Unit unit) {
+    public LogNormalRandomVariable(final double normalMean, final double normalSd, final QUnit unit) {
         this.normalMean = normalMean;
         this.normalSd = normalSd;
         this.unit = unit;
@@ -33,7 +33,7 @@ public class LogNormalRandomVariable extends RandomVariable {
     }
 
     @Override
-    public Unit getUnit() {
+    public QUnit getUnit() {
         return this.unit;
     }
 

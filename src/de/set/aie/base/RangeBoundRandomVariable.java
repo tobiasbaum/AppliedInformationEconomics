@@ -51,7 +51,7 @@ public class RangeBoundRandomVariable extends RandomVariable {
     }
 
     @Override
-    public Unit getUnit() {
+    public QUnit getUnit() {
         return this.base.getUnit();
     }
 

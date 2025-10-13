@@ -31,7 +31,7 @@ public class RandomVariableQuotient extends RandomVariable {
     }
 
     @Override
-    public Unit getUnit() {
+    public QUnit getUnit() {
         return this.r1.getUnit().div(this.r2.getUnit());
     }
 

@@ -19,9 +19,9 @@ public class NormalRandomVariable extends RandomVariable {
 
     private final double mean;
     private final double sd;
-    private final Unit unit;
+    private final QUnit unit;
 
-    public NormalRandomVariable(final double mean, final double sd, final Unit unit) {
+    public NormalRandomVariable(final double mean, final double sd, final QUnit unit) {
         this.mean = mean;
         this.sd = sd;
         this.unit = unit;
@@ -33,7 +33,7 @@ public class NormalRandomVariable extends RandomVariable {
     }
 
     @Override
-    public Unit getUnit() {
+    public QUnit getUnit() {
         return this.unit;
     }
 

@@ -25,9 +25,9 @@ public class LogNormalRandomVariableTest {
 
     @Test
     public void testDistribution1() {
-        final LogNormalRandomVariable v = Distributions.logNormal(1, 100, Unit.of("h"));
+        final LogNormalRandomVariable v = Distributions.logNormal(1, 100, QUnit.of("h"));
         assertEquals(VarKind.D, v.getType());
-        final double[] samples = sample(v, Unit.of("h")); //$NON-NLS-1$
+        final double[] samples = sample(v, QUnit.of("h")); //$NON-NLS-1$
         checkCountBetween(samples, Double.NEGATIVE_INFINITY, 0.0, 0, 0);
         checkCountBetween(samples, 0.0, 1.0, 5000, 100);
         checkCountBetween(samples, 1.0, 100.0, 90000, 500);

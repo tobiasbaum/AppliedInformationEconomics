@@ -57,7 +57,7 @@ public class TriangularRandomVariable extends RandomVariable {
     }
 
     @Override
-    public Unit getUnit() {
+    public QUnit getUnit() {
         return this.mode.getUnit();
     }
 

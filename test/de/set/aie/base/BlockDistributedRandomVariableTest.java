@@ -26,9 +26,9 @@ public class BlockDistributedRandomVariableTest {
 
     @Test
     public void testDistribution1() {
-        final BlockDistributedRandomVariable v = new BlockDistributedRandomVariable(3, 8, Unit.of("h"));
+        final BlockDistributedRandomVariable v = new BlockDistributedRandomVariable(3, 8, QUnit.of("h"));
         assertEquals(VarKind.D, v.getType());
-        final double[] samples = sample(v, Unit.of("h")); //$NON-NLS-1$
+        final double[] samples = sample(v, QUnit.of("h")); //$NON-NLS-1$
         checkCountBetween(samples, Double.NEGATIVE_INFINITY, 3.0, 5000, 200);
         checkCountBetween(samples, 3.0, 8.0, 90000, 400);
         checkCountBetween(samples, 3.0, 5.5, 45000, 400);
@@ -48,7 +48,7 @@ public class BlockDistributedRandomVariableTest {
         assertTrue("count " + count + " but expected smaller than " + (expectedCount + range), count <= expectedCount + range);
     }
 
-    static double[] sample(final RandomVariable v, final Unit expectedUnit) {
+    static double[] sample(final RandomVariable v, final QUnit expectedUnit) {
         assertEquals(expectedUnit, v.getUnit());
         final double[] ret = new double[100_000];
         final RandomSource r = RandomSource.wrap(new Random(1234));

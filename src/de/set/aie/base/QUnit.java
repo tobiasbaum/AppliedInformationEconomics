@@ -20,12 +20,12 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-public class Unit {
+public class QUnit {
 
     private final List<String> numer;
     private final List<String> denom;
 
-    private Unit(final List<String> n, final List<String> d) {
+    private QUnit(final List<String> n, final List<String> d) {
         final Iterator<String> iter = n.iterator();
         while (iter.hasNext()) {
             final String v = iter.next();
@@ -40,12 +40,12 @@ public class Unit {
         this.denom = d;
     }
 
-    public static Unit of(final String name) {
-        return new Unit(Collections.singletonList(name), Collections.emptyList());
+    public static QUnit of(final String name) {
+        return new QUnit(Collections.singletonList(name), Collections.emptyList());
     }
 
-    public static Unit scalar() {
-        return new Unit(Collections.emptyList(), Collections.emptyList());
+    public static QUnit scalar() {
+        return new QUnit(Collections.emptyList(), Collections.emptyList());
     }
 
     @Override
@@ -55,10 +55,10 @@ public class Unit {
 
     @Override
     public boolean equals(final Object o) {
-        if (!(o instanceof Unit)) {
+        if (!(o instanceof QUnit)) {
             return false;
         }
-        final Unit other = (Unit) o;
+        final QUnit other = (QUnit) o;
         return this.numer.equals(other.numer) && this.denom.equals(other.denom);
     }
 
@@ -77,16 +77,16 @@ public class Unit {
         }
     }
 
-    public Unit times(final Unit unit) {
+    public QUnit times(final QUnit unit) {
         final List<String> n = this.combine(this.numer, unit.numer);
         final List<String> d = this.combine(this.denom, unit.denom);
-        return new Unit(n, d);
+        return new QUnit(n, d);
     }
 
-    public Unit div(final Unit unit) {
+    public QUnit div(final QUnit unit) {
         final List<String> n = this.combine(this.numer, unit.denom);
         final List<String> d = this.combine(this.denom, unit.numer);
-        return new Unit(n, d);
+        return new QUnit(n, d);
     }
 
     private List<String> combine(final List<String> l1, final List<String> l2) {

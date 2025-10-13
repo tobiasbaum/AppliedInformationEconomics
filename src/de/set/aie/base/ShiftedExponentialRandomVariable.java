@@ -20,10 +20,10 @@ public class ShiftedExponentialRandomVariable extends RandomVariable {
     private final double lambda;
     private final double shift;
     private final boolean directionInverse;
-    private final Unit unit;
+    private final QUnit unit;
 
     public ShiftedExponentialRandomVariable(
-            final double lower, final double upper, final boolean directionInverse, final Unit unit) {
+            final double lower, final double upper, final boolean directionInverse, final QUnit unit) {
         final double diff = upper - lower;
         this.lambda = 2.30259 / diff;
         this.directionInverse = directionInverse;
@@ -39,7 +39,7 @@ public class ShiftedExponentialRandomVariable extends RandomVariable {
     }
 
     @Override
-    public Unit getUnit() {
+    public QUnit getUnit() {
         return this.unit;
     }
 

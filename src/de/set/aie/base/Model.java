@@ -125,10 +125,6 @@ public class Model {
         }
     }
 
-    public void add(final VarId name, final SyntacticExpression expression) {
-        this.add(name, (Function<Instance, RandomVariable>) expression::instantiate);
-    }
-
     public void add(final VarId name, final MultiVariableFactory factoryFunction) {
         for (final Entry<VarId, Function<Instance, RandomVariable>> f : factoryFunction.create(name).entrySet()) {
             this.add(f.getKey(), f.getValue());

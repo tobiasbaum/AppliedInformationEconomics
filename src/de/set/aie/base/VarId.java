@@ -19,7 +19,7 @@ public interface VarId extends SyntacticExpression {
         return of(this.toString() + "_" + subId);
     }
 
-    public default RandomVariable instantiate(Model.Instance inst) {
+    public default RandomVariable apply(Model.Instance inst) {
         return inst.get(this);
     }
 

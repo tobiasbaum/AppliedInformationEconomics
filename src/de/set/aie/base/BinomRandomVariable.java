@@ -21,7 +21,7 @@ public class BinomRandomVariable extends RandomVariable {
     private final RandomVariable propability;
 
     public BinomRandomVariable(final RandomVariable count, final RandomVariable prop) {
-        assert prop.getUnit().equals(Unit.scalar());
+        assert prop.getUnit().equals(QUnit.scalar());
         this.count = count;
         this.propability = prop;
     }
@@ -40,7 +40,7 @@ public class BinomRandomVariable extends RandomVariable {
     }
 
     @Override
-    public Unit getUnit() {
+    public QUnit getUnit() {
         return this.count.getUnit();
     }
 

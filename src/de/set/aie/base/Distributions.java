@@ -27,59 +27,59 @@ public class Distributions {
     public enum StdDist {
         NORMAL {
             @Override
-            public RandomVariable create(final Between range, final Unit unit) {
+            public RandomVariable create(final Between range, final QUnit unit) {
                 return normal(range.lower, range.upper, unit);
             }
         },
         LOG_NORMAL {
             @Override
-            public RandomVariable create(final Between range, final Unit unit) {
+            public RandomVariable create(final Between range, final QUnit unit) {
                 return logNormal(range.lower, range.upper, unit);
             }
         },
         SHIFTED_EXP {
             @Override
-            public RandomVariable create(final Between range, final Unit unit) {
+            public RandomVariable create(final Between range, final QUnit unit) {
                 return shiftedExp(range.lower, range.upper, unit);
             }
         },
         INVERSE_SHIFTED_EXP {
             @Override
-            public RandomVariable create(final Between range, final Unit unit) {
+            public RandomVariable create(final Between range, final QUnit unit) {
                 return inverseShiftedExp(range.lower, range.upper, unit);
             }
         },
         BLOCK {
             @Override
-            public RandomVariable create(final Between range, final Unit unit) {
+            public RandomVariable create(final Between range, final QUnit unit) {
                 return block(range.lower, range.upper, unit);
             }
         },
         FIXED {
             @Override
-            public RandomVariable create(final Between range, final Unit unit) {
+            public RandomVariable create(final Between range, final QUnit unit) {
                 return fixed(Quantity.of((range.lower + range.upper) / 2, unit));
             }
         };
 
-        public abstract RandomVariable create(Between range, Unit unit);
+        public abstract RandomVariable create(Between range, QUnit unit);
     }
 
     public enum StdDist3 {
         NORMAL_COMB {
             @Override
-            public RandomVariable create(final SingleMode range, final Unit unit) {
+            public RandomVariable create(final SingleMode range, final QUnit unit) {
                 return normalComb(range, unit);
             }
         },
         TRIANGLE {
             @Override
-            public RandomVariable create(final SingleMode range, final Unit unit) {
+            public RandomVariable create(final SingleMode range, final QUnit unit) {
                 return triangleAbsolute(range, unit);
             }
         };
 
-        public abstract RandomVariable create(SingleMode range, Unit unit);
+        public abstract RandomVariable create(SingleMode range, QUnit unit);
     }
 
     public static class Between {
@@ -123,22 +123,22 @@ public class Distributions {
         return new SingleMode(lower, mode, upper);
     }
 
-    public static NormalRandomVariable normal(final Between range90, final Unit unit) {
+    public static NormalRandomVariable normal(final Between range90, final QUnit unit) {
         return normal(range90.lower, range90.upper, unit);
     }
 
-    public static NormalRandomVariable normal(final double lower95, final double upper95, final Unit unit) {
+    public static NormalRandomVariable normal(final double lower95, final double upper95, final QUnit unit) {
         assert lower95 < upper95;
         final double mean = (lower95 + upper95) / 2.0;
         final double sd = (upper95 - lower95)  / NORMAL_TAIL_FACTOR / 2.0;
         return new NormalRandomVariable(mean, sd, unit);
     }
 
-    public static NormalCombRandomVariable normalComb(final SingleMode params, final Unit unit) {
+    public static NormalCombRandomVariable normalComb(final SingleMode params, final QUnit unit) {
         return new NormalCombRandomVariable(params.lower, params.mode, params.upper, unit);
     }
 
-    public static LogNormalRandomVariable logNormal(final double lower95, final double upper95, final Unit unit) {
+    public static LogNormalRandomVariable logNormal(final double lower95, final double upper95, final QUnit unit) {
         assert lower95 < upper95;
         assert 0.0 <= lower95;
         final double normalLower95 = lower95 > 0.0 ? Math.log(lower95) : 0.0;
@@ -148,7 +148,7 @@ public class Distributions {
         return new LogNormalRandomVariable(mean, sd, unit);
     }
 
-    public static BinomRandomVariable binom(final int count, final RandomVariable prop, final Unit unit) {
+    public static BinomRandomVariable binom(final int count, final RandomVariable prop, final QUnit unit) {
         return binom(fixed(Quantity.of(count, unit)), prop);
     }
 
@@ -160,19 +160,19 @@ public class Distributions {
         return new FixedRandomVariable(q);
     }
 
-    public static FixedRandomVariable fixed(final double value, Unit unit) {
+    public static FixedRandomVariable fixed(final double value, QUnit unit) {
         return fixed(Quantity.of(value, unit));
     }
 
-    public static FixedRandomVariable fixed(final int value, Unit unit) {
+    public static FixedRandomVariable fixed(final int value, QUnit unit) {
         return fixed(Quantity.of(value, unit));
     }
 
-    public static RandomVariable empirical(final Unit unit, final double... values) {
+    public static RandomVariable empirical(final QUnit unit, final double... values) {
         return new EmpiricalRandomVariable(unit, values);
     }
 
-    public static RandomVariable empirical(final Unit unit, final List<? extends Number> values) {
+    public static RandomVariable empirical(final QUnit unit, final List<? extends Number> values) {
         final double[] d = new double[values.size()];
         for (int i = 0; i < values.size(); i++) {
             d[i] = values.get(i).doubleValue();
@@ -180,19 +180,19 @@ public class Distributions {
         return new EmpiricalRandomVariable(unit, d);
     }
 
-    public static RandomVariable block(final double lower05, final double upper95, final Unit unit) {
+    public static RandomVariable block(final double lower05, final double upper95, final QUnit unit) {
         return new BlockDistributedRandomVariable(lower05, upper95, unit);
     }
 
-    public static RandomVariable block(final Between between, final Unit unit) {
+    public static RandomVariable block(final Between between, final QUnit unit) {
         return new BlockDistributedRandomVariable(between.lower, between.upper, unit);
     }
 
-    public static RandomVariable shiftedExp(final double lower, final double upper, final Unit unit) {
+    public static RandomVariable shiftedExp(final double lower, final double upper, final QUnit unit) {
         return new ShiftedExponentialRandomVariable(lower, upper, false, unit);
     }
 
-    public static RandomVariable inverseShiftedExp(final double lower, final double upper, final Unit unit) {
+    public static RandomVariable inverseShiftedExp(final double lower, final double upper, final QUnit unit) {
         return new ShiftedExponentialRandomVariable(lower, upper, true, unit);
     }
 
@@ -214,18 +214,18 @@ public class Distributions {
         return conditional(v1Prop, v1, fixed(Quantity.of(0, v1.getUnit())));
     }
 
-    public static RandomVariable triangleAbsolute(final SingleMode params, final Unit unit) {
+    public static RandomVariable triangleAbsolute(final SingleMode params, final QUnit unit) {
         return TriangularRandomVariable.fromAbsoluteMinMax(
                 Quantity.of(params.lower, unit),
                 Quantity.of(params.mode, unit),
                 Quantity.of(params.upper, unit));
     }
 
-    public static MultiVariableFactory unknown(List<Between> ranges, final Unit unit) {
+    public static MultiVariableFactory unknown(List<Between> ranges, final QUnit unit) {
         return unknown(EnumSet.allOf(StdDist.class), Double.NEGATIVE_INFINITY, ranges, Double.POSITIVE_INFINITY, unit);
     }
 
-    public static MultiVariableFactory unknown(final double lower, final double upper, final Unit unit) {
+    public static MultiVariableFactory unknown(final double lower, final double upper, final QUnit unit) {
         return unknown(Double.NEGATIVE_INFINITY, lower, upper, Double.POSITIVE_INFINITY, unit);
     }
 
@@ -234,7 +234,7 @@ public class Distributions {
             final double lower,
             final double upper,
             final double absoluteMax,
-            final Unit unit) {
+            final QUnit unit) {
         final EnumSet<StdDist> distributions = EnumSet.allOf(StdDist.class);
         return unknown(distributions, absoluteMin, lower, upper, absoluteMax, unit);
     }
@@ -245,7 +245,7 @@ public class Distributions {
             final double lower,
             final double upper,
             final double absoluteMax,
-            final Unit unit) {
+            final QUnit unit) {
         assert absoluteMin <= lower;
         assert lower < upper;
         assert upper <= absoluteMax;
@@ -259,7 +259,7 @@ public class Distributions {
             final double absoluteMin,
             final List<Between> estimatedRanges,
             final double absoluteMax,
-            final Unit unit) {
+            final QUnit unit) {
         return new UnknownDistFactory(possibleDistributions, absoluteMin, estimatedRanges, absoluteMax, unit);
     }
 
@@ -274,7 +274,7 @@ public class Distributions {
      * @param positiveInSample Anzahl der Elemente in der Stichprobe mit Eigenschaft X
      */
     public static BetaBinomialRandomVariable extrapolateFromSample(
-            int populationSize, int sampleSize, int positiveInSample, Unit unit) {
+            int populationSize, int sampleSize, int positiveInSample, QUnit unit) {
         assert sampleSize <= populationSize;
         assert positiveInSample <= sampleSize;
         assert positiveInSample >= 0;

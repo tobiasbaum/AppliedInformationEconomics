@@ -27,9 +27,9 @@ public class BinomRandomVariableTest {
     public void testDistribution1() {
         final BinomRandomVariable v = new BinomRandomVariable(
                 Distributions.fixed(Quantity.of(99, "h")),
-                Distributions.fixed(Quantity.of(0.5, Unit.scalar())));
+                Distributions.fixed(Quantity.of(0.5, QUnit.scalar())));
         assertEquals(VarKind.C, v.getType());
-        final double[] samples = sample(v, Unit.of("h")); //$NON-NLS-1$
+        final double[] samples = sample(v, QUnit.of("h")); //$NON-NLS-1$
         checkCountBetween(samples, Double.NEGATIVE_INFINITY, 0.0, 0, 0);
         checkCountBetween(samples, 0.0, 49.5, 50000, 500);
         checkCountBetween(samples, 99.5, Double.POSITIVE_INFINITY, 0, 0);
@@ -39,9 +39,9 @@ public class BinomRandomVariableTest {
     public void testDistribution2() {
         final BinomRandomVariable v = new BinomRandomVariable(
                 Distributions.fixed(Quantity.of(99, "h")),
-                Distributions.fixed(Quantity.of(0.0, Unit.scalar())));
+                Distributions.fixed(Quantity.of(0.0, QUnit.scalar())));
         assertEquals(VarKind.C, v.getType());
-        final double[] samples = sample(v, Unit.of("h")); //$NON-NLS-1$
+        final double[] samples = sample(v, QUnit.of("h")); //$NON-NLS-1$
         checkCountBetween(samples, Double.NEGATIVE_INFINITY, 0.0, 0, 0);
         checkCountBetween(samples, 0.0, 0.5, 100000, 0);
         checkCountBetween(samples, 0.5, Double.POSITIVE_INFINITY, 0, 0);
@@ -51,9 +51,9 @@ public class BinomRandomVariableTest {
     public void testDistribution3() {
         final BinomRandomVariable v = new BinomRandomVariable(
                 Distributions.fixed(Quantity.of(99, "h")),
-                Distributions.fixed(Quantity.of(1.0, Unit.scalar())));
+                Distributions.fixed(Quantity.of(1.0, QUnit.scalar())));
         assertEquals(VarKind.C, v.getType());
-        final double[] samples = sample(v, Unit.of("h")); //$NON-NLS-1$
+        final double[] samples = sample(v, QUnit.of("h")); //$NON-NLS-1$
         checkCountBetween(samples, Double.NEGATIVE_INFINITY, 98.5, 0, 0);
         checkCountBetween(samples, 99.0, 99.5, 100000, 0);
         checkCountBetween(samples, 99.5, Double.POSITIVE_INFINITY, 0, 0);
