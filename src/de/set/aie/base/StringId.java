@@ -3,7 +3,7 @@ package de.set.aie.base;
 /**
  * Variablenbezeichnung auf Basis eines Strings.
  */
-public class StringId implements VarId {
+public final class StringId implements VarId {
     private String id;
 
     public StringId(String id) {

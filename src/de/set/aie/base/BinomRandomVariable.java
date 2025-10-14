@@ -18,18 +18,18 @@ package de.set.aie.base;
 public class BinomRandomVariable extends RandomVariable {
 
     private final RandomVariable count;
-    private final RandomVariable propability;
+    private final RandomVariable probability;
 
     public BinomRandomVariable(final RandomVariable count, final RandomVariable prop) {
         assert prop.getUnit().equals(QUnit.scalar());
         this.count = count;
-        this.propability = prop;
+        this.probability = prop;
     }
 
     @Override
     public Quantity observe(final RandomSource r, final SimulationRun run) {
         final long cnt = Math.round(this.count.observe(r, run).getNumber());
-        final double p = this.propability.observe(r, run).getNumber();
+        final double p = this.probability.observe(r, run).getNumber();
         long sum = 0;
         for (long i = 0; i < cnt; i++) {
             if (r.nextDouble() < p) {

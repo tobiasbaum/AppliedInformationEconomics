@@ -22,7 +22,7 @@ import java.util.Set;
 public class SimulationRun {
 
     private final Map<VarId, Quantity> values = new LinkedHashMap<>();
-    private final Map<String, Object> objects = new LinkedHashMap<>();
+    private final Map<Object, Object> objects = new LinkedHashMap<>();
 
     public boolean hasPersistentValue(VarId name) {
         return this.values.containsKey(name);
@@ -41,16 +41,16 @@ public class SimulationRun {
         return q;
     }
 
-    public boolean hasPersistentObject(String name) {
+    public boolean hasPersistentObject(Object name) {
         return this.objects.containsKey(name);
     }
 
-    public void persistObject(String name, Object v) {
+    public void persistObject(Object name, Object v) {
         assert !this.values.containsKey(name);
         this.objects.put(name, v);
     }
 
-    public Object getPersistentObject(String name) {
+    public Object getPersistentObject(Object name) {
         final Object q = this.objects.get(name);
         if (q == null) {
             throw new AssertionError("object was not persisted: " + name);

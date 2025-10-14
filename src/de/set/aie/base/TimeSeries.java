@@ -47,7 +47,7 @@ public abstract class TimeSeries {
     /**
      * Komponentenweises Maximum aus zwei Zeitreihen.
      */
-    public final TimeSeries max(TimeSeries other) {
+    public final TimeSeries notLessThan(TimeSeries other) {
         return new CombinedTimeSeries(this, other, RandomVariable::max);
     }
 
@@ -85,6 +85,14 @@ public abstract class TimeSeries {
      */
     public TimeSeries shrinkAfter(VarId yearsUntil, VarId shrinkRate) {
         return new ShrinkAfterTimeSeries(this, yearsUntil, shrinkRate);
+    }
+
+    /**
+     * Liefert eine Zeitreihe, die um den übergebenen Zeitraum verschoben ist (z.B. delay(2) := Beginn erfolgt zwei
+     * Jahre später).
+     */
+    public TimeSeries delay(int delay) {
+        return new DelayedTimeSeries(this, delay);
     }
 
     /**

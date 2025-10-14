@@ -18,8 +18,11 @@ public class ConditionalTimeSeries extends TimeSeries {
         this.decision = v1prop.subvar("decision");
         // Damit für jeden Zeitpunkt die gleiche Zeitreihe kommt, muss die Entscheidung
         // persistent sein. Deshalb wird hier eine entsprechende Variable eingeführt.
-        m.add(this.decision, (Model.Instance inst) ->
-                Distributions.conditional(inst.get(v1prop), TRUE, FALSE));
+        // Wenn sie bereits existiert, wird die bestehende genutzt (unter der Annahme, dass sie passend angelegt wurde)
+        if (!m.getAllPersistentVariables().contains(decision)) {
+            m.add(this.decision, (Model.Instance inst) ->
+                    Distributions.conditional(inst.get(v1prop), TRUE, FALSE));
+        }
         this.v1 = v1;
         this.v2 = v2;
     }

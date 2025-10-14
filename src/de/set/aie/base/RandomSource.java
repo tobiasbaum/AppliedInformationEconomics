@@ -60,5 +60,8 @@ public interface RandomSource {
         return this.nextDouble() < propabilityForTrue;
     }
 
-
+    public default long round(double number) {
+        double floor = Math.floor(number);
+        return (long) floor + (nextBool(number - floor) ? 1 : 0);
+    }
 }
