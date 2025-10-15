@@ -33,9 +33,11 @@ public class Sample {
         final StringBuilder ret = new StringBuilder();
         ret.append(format("Mean:    ", this.meanQ())).append('\n');
         ret.append(format("Min:     ", Quantity.of(this.numbers[0], this.unit))).append('\n');
+        ret.append(format("5% Quant:", Quantity.of(this.numbers[this.numbers.length / 20], this.unit))).append('\n');
         ret.append(format("1. Quart:", Quantity.of(this.numbers[this.numbers.length / 4], this.unit))).append('\n');
         ret.append(format("Median:  ", Quantity.of(this.median(), this.unit))).append('\n');
         ret.append(format("3. Quart:", Quantity.of(this.numbers[this.numbers.length * 3 / 4], this.unit))).append('\n');
+        ret.append(format("95% Quan:", Quantity.of(this.numbers[this.numbers.length * 19 / 20], this.unit))).append('\n');
         ret.append(format("Max:     ", Quantity.of(this.numbers[this.numbers.length - 1], this.unit))).append('\n');
         return ret.toString();
     }
