@@ -98,7 +98,7 @@ public abstract class TimeSeries {
     /**
      * Liefert den Wert für den übergebenen Zeitpunkt (z.B. Jahr).
      */
-    public abstract Function<Model.Instance, RandomVariable> getFor(int time);
+    public abstract Function<Model.Instance, ? extends RandomVariable> getFor(int time);
 
     /**
      * Gibt die übergebenen Zeitreihen als CSV aus (jeweils den Mittelwert).

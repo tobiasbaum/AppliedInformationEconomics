@@ -15,7 +15,7 @@ public class DelayedTimeSeries extends TimeSeries {
     }
 
     @Override
-    public Function<Model.Instance, RandomVariable> getFor(int time) {
+    public Function<Model.Instance, ? extends RandomVariable> getFor(int time) {
         if (time < delay) {
             // am Anfang wird mit Nullen aufgefüllt
             return (Model.Instance inst) -> Distributions.fixed(0, base.getFor(0).apply(inst).getUnit());
