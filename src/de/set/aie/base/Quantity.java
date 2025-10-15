@@ -35,6 +35,10 @@ public class Quantity implements Comparable<Quantity> {
         return new Quantity(value, unit);
     }
 
+    public static Quantity of(final int value, final QUnit unit) {
+        return new Quantity(value, unit);
+    }
+
     public Quantity plus(final Quantity other) {
         if (!this.unit.equals(other.unit)) {
             throw new AssertionError("incompatible units: " + this.unit + " vs " + other.unit);
@@ -54,6 +58,13 @@ public class Quantity implements Comparable<Quantity> {
             throw new AssertionError("incompatible units: " + this.unit + " vs " + other.unit);
         }
         return this.getNumber() >= other.getNumber() ? this : other;
+    }
+
+    public Quantity min(final Quantity other) {
+        if (!this.unit.equals(other.unit)) {
+            throw new AssertionError("incompatible units: " + this.unit + " vs " + other.unit);
+        }
+        return this.getNumber() <= other.getNumber() ? this : other;
     }
 
     public Quantity times(final Quantity other) {
